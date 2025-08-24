@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom utility for main-font */
+@layer utilities {
+  .main-font {
+    font-family:
+      "System", "SF Pro Display", "-apple-system", "BlinkMacSystemFont",
+      "Roboto", sans-serif;
+    font-weight: 600;
+    line-height: 22px;
+    letter-spacing: 0px;
+  }
+}
