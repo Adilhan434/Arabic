@@ -1,7 +1,13 @@
 import { Stack } from "expo-router";
 import React from "react";
+import { LanguageProvider } from "@/components/LanguageContext";
+
 import "./global.css";
 
 export default function RootLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <LanguageProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </LanguageProvider>
+  );
 }

@@ -1,0 +1,16 @@
+{
+  "welcome": "Добро пожаловать",
+  "language": "Язык",
+  "startLearning": "Начать обучение",
+  "mainArabic": "تعلم قراءة الح",
+  "mainEnglish": "Учись читать арабские буквы по 10 минут в день",
+  "continueLearning": "Продолжить обучение",
+  "newLesson": "Новый урок",
+  "settings": "Настройки",
+  "profile": "Профиль",
+  "sound": "Звук интерфейса",
+  "general": "Общее",
+  "resetResults": "Сбросить результаты",
+  "sendFeedback": "Отправить отзыв",
+  "recommend": "Рекомендовать"
+}

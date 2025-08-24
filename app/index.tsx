@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 
+
 const orange = "#FF6B35";
 
 export default function Index() {
