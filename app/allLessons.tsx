@@ -1,13 +1,46 @@
 import { path } from "@/lessonRelated.js";
+import { getLessonProgress } from "@/utils/lessonProgress";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const AllLessons = () => {
   const router = useRouter();
+  const [lessonsProgress, setLessonsProgress] = useState<
+    Record<string, number>
+  >({});
+
+  // Загружаем прогресс всех уроков при загрузке экрана
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadAllProgress = async () => {
+        const progressData: Record<string, number> = {};
+
+        for (const lesson of path) {
+          const lessonKey = Object.keys(lesson)[0];
+          const progress = await getLessonProgress(lessonKey);
+          // Если прогресс 0, то урок не начат - показываем 0%
+          // Если прогресс >= 15, то урок завершен - показываем 100%
+          // Иначе показываем реальный процент
+          const percentage =
+            progress === 0
+              ? 0
+              : progress >= 15
+                ? 100
+                : Math.round((progress / 15) * 100);
+          progressData[lessonKey] = percentage;
+        }
+
+        setLessonsProgress(progressData);
+      };
+
+      loadAllProgress();
+    }, [])
+  );
 
   const handleLessonSelect = async (
     lessonKey: string,
@@ -35,28 +68,50 @@ const AllLessons = () => {
   const renderLessonCard = ({ item, index }: { item: any; index: number }) => {
     const lessonKey = Object.keys(item)[0];
     const letter = item[lessonKey];
+    const progress = lessonsProgress[lessonKey] || 0;
+    const isCompleted = progress >= 100;
 
     return (
-      <TouchableOpacity
-        className="bg-orange rounded-[25px] p-6 m-2 items-center justify-center min-h-[120px] flex-1 max-w-[45%]"
-        onPress={() => {
-          handleLessonSelect(lessonKey, letter, index);
-        }}
-        style={{
-          shadowColor: "#000000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 8,
-          elevation: 5,
-        }}
-      >
-        <Text className="text-white font-semibold text-[16px] mb-2 text-center">
-          Letter {index + 1}
-        </Text>
-        <Text className="text-white font-bold text-[28px] font-noto text-center">
-          {letter}
-        </Text>
-      </TouchableOpacity>
+      <View style={{ marginBottom: 16 }}>
+        <TouchableOpacity
+          className="rounded-[14px] flex-row items-center min-h-[68px] border-[4px] border-primary bg-white"
+          onPress={() => {
+            handleLessonSelect(lessonKey, letter, index);
+          }}
+          style={{
+            shadowColor: "#000000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 8,
+            elevation: 5,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+          }}
+        >
+          {/* Левая часть - прогресс */}
+          <View className="flex-col items-center justify-center w-16">
+            <View className="items-center">
+              <View
+                className={`w-12 h-12 rounded-full items-center justify-center ${isCompleted ? "bg-green-500" : "bg-orange"}`}
+              >
+                <Text className="text-white text-xs font-bold">
+                  {progress}%
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Центральная часть - информация об уроке */}
+          <View className="flex-1 flex-row items-center justify-center">
+            <Text className="font-semibold text-[16px] mr-5 text-center">
+              Lesson {index + 1}:
+            </Text>
+            <Text className="font-bold text-[38px] font-noto text-center">
+              {letter}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -67,21 +122,37 @@ const AllLessons = () => {
         <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2">
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text className="flex-1 text-center text-white text-[24px] font-bold">
-          All Lessons
+        <Text className="flex-1 text-center main-font text-white text-[33px] font-bold">
+          All lessons
         </Text>
         <View className="w-8" />
       </View>
 
-      <View className="flex-1 px-4">
+      <View className="flex-1 px-4 ">
         <FlatList
           data={path}
           renderItem={renderLessonCard}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={2}
+          keyExtractor={(item, index) => `lesson-${index}`}
           showsVerticalScrollIndicator={false}
+          removeClippedSubviews={true}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          getItemLayout={(data, index) => ({
+            length: 84, // height of item + margin
+            offset: 84 * index,
+            index,
+          })}
           contentContainerStyle={{
-            paddingBottom: 120, // space for bottom navigation
+            paddingBottom: 120,
+            paddingTop: 20,
+            paddingHorizontal: 22,
+          }}
+          style={{
+            backgroundColor: "white",
+            borderRadius: 10,
+            marginHorizontal: -16,
+            marginTop: 0,
           }}
         />
       </View>

@@ -1,23 +1,23 @@
-import * as Localization from 'expo-localization';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getLocales } from "expo-localization";
 
-import ruTranslations from './ru.json';
-import enTranslations from './en.json';
-import kgTranslations from './kg.json';
+import enTranslations from "./en.json";
+import kgTranslations from "./kg.json";
+import ruTranslations from "./ru.json";
 
 export const translations = {
   ru: ruTranslations,
   en: enTranslations,
-  kg: kgTranslations
+  kg: kgTranslations,
 };
 
 export const languages = [
-  { code: 'ru', name: 'Русский', nativeName: 'Русский' },
-  { code: 'en', name: 'English', nativeName: 'English' },
-  { code: 'kg', name: 'Кыргызча', nativeName: 'Кыргызча' }
+  { code: "ru", name: "Русский", nativeName: "Русский" },
+  { code: "en", name: "English", nativeName: "English" },
+  { code: "kg", name: "Кыргызча", nativeName: "Кыргызча" },
 ];
 
-const LANGUAGE_KEY = 'selected-language';
+const LANGUAGE_KEY = "selected-language";
 
 export const getCurrentLanguage = async (): Promise<string> => {
   try {
@@ -25,12 +25,21 @@ export const getCurrentLanguage = async (): Promise<string> => {
     if (savedLanguage) {
       return savedLanguage;
     }
-    
-    const systemLanguage = Localization.locale.split('-')[0];
-    return languages.find(lang => lang.code === systemLanguage) ? systemLanguage : 'ru';
+
+    // Используем современный API getLocales() вместо устаревшего locale
+    const locales = getLocales();
+    if (locales && locales.length > 0 && locales[0].languageCode) {
+      const systemLanguage = locales[0].languageCode;
+      return languages.find((lang) => lang.code === systemLanguage)
+        ? systemLanguage
+        : "ru";
+    }
+
+    // Если локаль недоступна, возвращаем русский по умолчанию
+    return "ru";
   } catch (error) {
-    console.error('Error getting language:', error);
-    return 'ru';
+    console.error("Error getting language:", error);
+    return "ru";
   }
 };
 
@@ -38,7 +47,7 @@ export const setLanguage = async (languageCode: string): Promise<void> => {
   try {
     await AsyncStorage.setItem(LANGUAGE_KEY, languageCode);
   } catch (error) {
-    console.error('Error setting language:', error);
+    console.error("Error setting language:", error);
   }
 };
 

@@ -1,6 +1,9 @@
 import Footer from "@/components/forLesson/Footer";
-import HeaderForLesson from "@/components/forLesson/HeaderForLesson"
+// import HeaderForLesson from "@/components/forLesson/HeaderForLesson";
+// import HeaderForLessonSimple from "@/components/forLesson/HeaderForLessonSimple";
+import HeaderForLessonMinimal from "@/components/forLesson/HeaderForLessonMinimal";
 import { lessons } from "@/lessonRelated.js";
+import { setLessonProgress } from "@/utils/lessonProgress";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEvent } from "expo";
@@ -35,7 +38,10 @@ if (!global.activeVideoPlayer) {
   global.activeVideoPlayer = null;
 }
 
-const { width } = Dimensions.get("window");
+const PreloadNextVideo = ({ video }: { video: any }) => {
+  useVideoPlayer(video);
+  return null;
+};
 
 const SceneId = () => {
   const { lessonName, sceneId } = useLocalSearchParams();
@@ -43,6 +49,20 @@ const SceneId = () => {
   const lessonKey = lessonName as keyof typeof lessons;
   const scene = lessons[lessonKey]?.[id];
   const title = lessons[lessonKey]?.[0] as string;
+
+  // Сохраняем прогресс при изменении сцены
+  useEffect(() => {
+    const saveProgress = async () => {
+      if (lessonName && !isNaN(id)) {
+        try {
+          await setLessonProgress(lessonName as string, id);
+        } catch (error) {
+          console.error("Error saving lesson progress:", error);
+        }
+      }
+    };
+    saveProgress();
+  }, [lessonName, id]);
 
   if (!lessonName || isNaN(id) || !scene) {
     return (
@@ -55,11 +75,11 @@ const SceneId = () => {
   }
 
   if (id === 1) {
-    return <VideoScene scene={scene} title={title} />;
+    return <VideoScene scene={scene} title={title} currentScene={id} />;
   }
 
-  if (id >= 2 && id <= 14) {
-    return <AudioScene scene={scene} title={title} />;
+  if (id >= 2 && id <= 15) {
+    return <AudioScene scene={scene} title={title} currentScene={id} />;
   }
 
   return (
@@ -69,12 +89,15 @@ const SceneId = () => {
   );
 };
 
-const PreloadNextVideo = ({ video }: { video: any }) => {
-  useVideoPlayer(video);
-  return null;
-};
-
-const VideoScene = ({ scene, title }: { scene: any; title: string }) => {
+const VideoScene = ({
+  scene,
+  title,
+  currentScene,
+}: {
+  scene: any;
+  title: string;
+  currentScene: number;
+}) => {
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -163,7 +186,11 @@ const VideoScene = ({ scene, title }: { scene: any; title: string }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <HeaderForLesson header={title} />
+      <HeaderForLessonMinimal
+        header={title}
+        currentScene={currentScene}
+        totalScenes={15}
+      />
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         {isLoading && (
           <View
@@ -233,7 +260,15 @@ const VideoScene = ({ scene, title }: { scene: any; title: string }) => {
   );
 };
 
-const AudioScene = ({ scene, title }: { scene: any; title: string }) => {
+const AudioScene = ({
+  scene,
+  title,
+  currentScene,
+}: {
+  scene: any;
+  title: string;
+  currentScene: number;
+}) => {
   const audioRef = useRef<Audio.Sound | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -293,7 +328,7 @@ const AudioScene = ({ scene, title }: { scene: any; title: string }) => {
         } else {
           sound.unloadAsync();
         }
-      } catch (err) {
+      } catch {
         if (isActive) setHasError(true);
       } finally {
         if (isActive) setIsLoading(false);
@@ -331,8 +366,8 @@ const AudioScene = ({ scene, title }: { scene: any; title: string }) => {
           await audioRef.current.playAsync();
           setIsPlaying(true);
           console.log("Автоматическое воспроизведение начато");
-        } catch (err) {
-          console.error("Ошибка при автоматическом воспроизведении:", err);
+        } catch {
+          console.error("Ошибка при автоматическом воспроизведении:");
           setHasError(true);
         }
       }
@@ -374,7 +409,7 @@ const AudioScene = ({ scene, title }: { scene: any; title: string }) => {
         await audioRef.current.playAsync();
         setIsPlaying(true);
       }
-    } catch (err) {
+    } catch {
       setHasError(true);
     } finally {
       setIsLoading(false);
@@ -389,7 +424,11 @@ const AudioScene = ({ scene, title }: { scene: any; title: string }) => {
   return (
     <SafeAreaView className="flex-1">
       <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <HeaderForLesson header={title} />
+      <HeaderForLessonMinimal
+        header={title}
+        currentScene={currentScene}
+        totalScenes={15}
+      />
 
       <ScrollView contentContainerClassName="flex-1 items-center justify-center">
         {scene.explain && (

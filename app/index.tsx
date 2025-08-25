@@ -1,5 +1,6 @@
-import { icons, texts } from "@/consonants.js";
 import Footer from "@/components/Footer";
+import { icons, texts } from "@/consonants.js";
+import { getLessonProgress, getCurrentScene } from "@/utils/lessonProgress";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,7 +15,6 @@ import {
   View,
 } from "react-native";
 
-
 const orange = "#FF6B35";
 
 export default function Index() {
@@ -24,6 +24,8 @@ export default function Index() {
     letter: "ا ب",
     index: 1,
   });
+  const [lessonProgress, setLessonProgress] = useState(0);
+  const [currentScene, setCurrentScene] = useState(1);
 
   // Загружаем сохраненный прогресс при загрузке экрана
   useFocusEffect(
@@ -34,6 +36,12 @@ export default function Index() {
           if (savedLesson) {
             const parsed = JSON.parse(savedLesson);
             setCurrentLesson(parsed);
+
+            // Загружаем прогресс урока
+            const progress = await getLessonProgress(parsed.lessonKey);
+            const scene = await getCurrentScene(parsed.lessonKey);
+            setLessonProgress(progress);
+            setCurrentScene(scene);
           }
         } catch (error) {
           console.error("Error loading current lesson:", error);
@@ -47,7 +55,7 @@ export default function Index() {
   return (
     <View className="flex-1 items-center justify-center pb-[100px] bg-primary">
       {/* book and welcome text */}
-      <View className="relative flex items-center  w-[345px] h-[347px]">
+      <View className="relative flex items-center overflow-hidden w-[345px] h-[347px]">
         <Image source={icons.main} className="w-[172px] h-[172px]" />
         <View className="relative -top-6">
           {/* Shadow element for Android offset effect */}
@@ -80,29 +88,47 @@ export default function Index() {
       </View>
 
       {/* statistics and other buttons */}
-      <View className="bg-secondary w-[345px] mt-[30px] gap-[20px] justify-around h-[261px] rounded-[25px]">
+      <View className="bg-secondary w-[345px] mt-[30px] gap-[20px] justify-around h-[265px] rounded-[25px]">
         {/* progress and current letter */}
-        <View className="flex-row  justify-around mx-[25px] h-[66px] items-end">
+        <View className="flex-row  justify-around w-[295px] mx-[25px] h-[66px] items-center">
           <View className="flex flex-col gap-[6px] items-start">
             <Text className="main-font text-[14px] font-semibold">
-              Continue learning arabic
             </Text>
-            {/* here will be dynamic parameters */}
-            <Text className="main-font text-[20px] font-semibold">
-              Lesson {currentLesson.index}: {currentLesson.letter}
-            </Text>
-            <ProgressBar percent={50} />
+            <View className="flex-row">
+              <Text className="main-font text-[20px] font-semibold leading-[22px]">
+                Lesson {currentLesson.index}: 
+              </Text>
+              <Text className="font-semibold text-[20px] leading-[22px]">{currentLesson.letter}  </Text>
+            </View>
+            <View className="flex-row items-center gap-2">
+              <ProgressBar
+                percent={
+                  lessonProgress >= 15
+                    ? 100
+                    : Math.round((lessonProgress / 15) * 100)
+                }
+              />
+              <Text className="main-font text-[12px] font-medium text-gray-600">
+                {lessonProgress >= 15
+                  ? 100
+                  : Math.round((lessonProgress / 15) * 100)}
+                %
+              </Text>
+            </View>
           </View>
-          <Pressable
-            className="w-[124px] h-[50px] bg-orange rounded-[38px] items-center justify-center"
-            onPress={() => {
-              router.push(`/lesson/${currentLesson.lessonKey}/1`);
-            }}
-          >
-            <Text className="text-white font-semibold  text-[20px] main-font">
-              continue
-            </Text>
-          </Pressable>
+            <Pressable
+              className="w-[124px] h-[50px] bg-orange rounded-[38px] items-center justify-center"
+              style={styles.pressable}
+              onPress={() => {
+                router.push(
+                  `/lesson/${currentLesson.lessonKey}/${currentScene}`
+                );
+              }}
+            >
+              <Text className="text-white font-semibold  text-[20px] main-font">
+                continue
+              </Text>
+            </Pressable>
         </View>
 
         <View className="h-[129px] mb-[21px] mx-[25px] items-start">
@@ -110,7 +136,7 @@ export default function Index() {
             Lorem ipsum
           </Text>
           <View className="flex-row flex justify-between mt-[23px] w-full">
-            <View className="w-[89px] h-[87px] bg-orange rounded-[25px] justify-center items-center">
+            <View className="w-[89px] h-[87px] bg-orange rounded-[15px] justify-center items-center">
               <Image className="" source={icons.book}></Image>
               <Text className="main-font text-[12px] font-semibold text-secondary">
                 Alphabet
@@ -137,7 +163,7 @@ export default function Index() {
                   router.push("/allLessons");
                 }
               }}
-              className="w-[89px] h-[87px] bg-orange rounded-[25px] justify-center items-center"
+              className="w-[89px] h-[87px] bg-orange rounded-[15px] justify-center items-center"
             >
               <Image
                 className="w-[41px] h-[41px]"
@@ -148,7 +174,7 @@ export default function Index() {
               </Text>
             </TouchableOpacity>
 
-            <View className="w-[89px] h-[87px] bg-orange rounded-[25px] justify-center items-center">
+            <View className="w-[89px] h-[87px] bg-orange rounded-[15px] justify-center items-center">
               <Image
                 className="w-[41px] h-[41px]"
                 source={icons.approval}
@@ -175,6 +201,9 @@ const styles = StyleSheet.create({
     // Android shadow property (smaller elevation since we have manual shadow)
     elevation: 5,
   },
+  pressable: {
+    alignSelf: 'flex-end'
+  }
 });
 
 const ProgressBar: React.FC<{ percent: number }> = ({ percent }) => {

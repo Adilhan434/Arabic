@@ -1,7 +1,7 @@
-import { View, Pressable, Image } from 'react-native'
-import {icons} from '@/consonants.js'
-import React from 'react'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { icons } from "@/consonants.js";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React from "react";
+import { Image, Pressable, View } from "react-native";
 
 const Footer = () => {
   const router = useRouter();
@@ -43,7 +43,7 @@ const Footer = () => {
 
   const handleNext = async () => {
     await stopCurrentMedia();
-    if (currentId !== 14) {
+    if (currentId < 15) {
       router.push(`/lesson/${lessonName}/${currentId + 1}`);
     } else {
       router.push(`/lesson/${lessonName}/1`);
@@ -77,10 +77,7 @@ const Footer = () => {
           opacity: pressed || currentId <= 1 ? 0.5 : 1,
         })}
       >
-        <Image
-          source={icons.left_circle}
-          style={{ tintColor:  "#fff" }}
-        />
+        <Image source={icons.left_circle} style={{ tintColor: "#fff" }} />
       </Pressable>
 
       <Pressable
@@ -89,10 +86,7 @@ const Footer = () => {
           opacity: pressed ? 0.5 : 1,
         })}
       >
-        <Image
-          source={icons.right_circle}
-          style={{ tintColor: "#fff" }}
-        />
+        <Image source={icons.right_circle} style={{ tintColor: "#fff" }} />
       </Pressable>
     </View>
   );
