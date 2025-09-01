@@ -1,6 +1,6 @@
 import { icons } from "@/consonants.js";
 import { useRouter } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 
 interface HeaderForLessonProps {
   header: string;
@@ -47,91 +47,35 @@ const HeaderForLessonMinimal = ({
 
   return (
     <View>
-      <View style={styles.header}>
+      <View className="w-full bg-[#0B503D] h-[100px] px-4 py-3 items-end justify-between flex-row">
         <Pressable onPress={stopCurrentMediaAndGoHome}>
-          <Image source={icons.left_circle} style={{ width: 40, height: 40 }} />
+          <Image source={icons.left_circle} style={{width: 38, height:38}} />
         </Pressable>
 
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{header}</Text>
-          <Text style={styles.subtitle}>тамгасы</Text>
+        <View className="flex-row gap-5 justify-center items-center">
+          <Text className="font-extrabold text-[40px] leading-[64px] text-orange">
+            {header}
+          </Text>
+          <Text className="text-white font-normal text-2xl leading-[27px]">
+            тамгасы
+          </Text>
         </View>
 
-        <View style={{ width: 40, height: 40 }} />
+        <View className="w-10 h-10" />
       </View>
 
       {/* Inline progress bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressHeader}></View>
-        <View style={styles.progressBarContainer}>
+      <View className="w-full pt-[7px] bg-gray-50 border-b border-gray-300">
+        <View className="flex-row items-center justify-between mb-0"></View>
+        <View className="w-full h-2 bg-gray-300 overflow-hidden">
           <View
-            style={[styles.progressBar, { width: `${progressPercent}%` }]}
+            className="h-full bg-black"
+            style={{ width: `${progressPercent}%` }}
           />
         </View>
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  header: {
-    width: "100%",
-    backgroundColor: "#0B503D",
-    height: 100,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    flexDirection: "row",
-  },
-  titleContainer: {
-    flexDirection: "row",
-    gap: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontWeight: "800",
-    fontSize: 32,
-    lineHeight: 41,
-    color: "#000000",
-  },
-  subtitle: {
-    color: "#000000",
-    fontWeight: "400",
-    fontSize: 20,
-    lineHeight: 27,
-  },
-  progressContainer: {
-    width: "100%",
-    paddingTop: 7,
-    backgroundColor: "#f9f9f9",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-  },
-  progressHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 0,
-  },
-  progressText: {
-    fontSize: 14,
-    color: "#6b7280",
-    fontWeight: "500",
-  },
-  progressBarContainer: {
-    width: "100%",
-    height: 8,
-    backgroundColor: "#e5e7eb",
-    borderRadius: 0,
-    overflow: "hidden",
-  },
-  progressBar: {
-    height: "100%",
-    backgroundColor: "#000",
-    borderRadius:0,
-  },
-});
 
 export default HeaderForLessonMinimal;

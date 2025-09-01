@@ -65,10 +65,10 @@ const Footer = () => {
         paddingVertical: 20,
         width: "100%",
         height: 90,
-        backgroundColor: "#6366F1", // primary цвет
         alignItems: "center",
         justifyContent: "space-between",
       }}
+      className='bg-primary'
     >
       <Pressable
         onPress={handlePrevious}
@@ -77,7 +77,7 @@ const Footer = () => {
           opacity: pressed || currentId <= 1 ? 0.5 : 1,
         })}
       >
-        <Image source={icons.left_circle} style={{ tintColor: "#fff" }} />
+        <Image source={icons.left_circle} style={{width:38, height:38}} />
       </Pressable>
 
       <Pressable
@@ -86,7 +86,7 @@ const Footer = () => {
           opacity: pressed ? 0.5 : 1,
         })}
       >
-        <Image source={icons.right_circle} style={{ tintColor: "#fff" }} />
+        <Image source={icons.right_circle}  style={{width:38, height:38}} />
       </Pressable>
     </View>
   );
