@@ -53,7 +53,7 @@ const HeaderForLessonMinimal = ({
         </Pressable>
 
         <View className="flex-row gap-5 justify-center items-center">
-          <Text className="font-extrabold text-[40px] leading-[64px] text-orange">
+          <Text className="font-extrabold text-[40px] leading-[64px] text-white">
             {header}
           </Text>
           <Text className="text-white font-normal text-2xl leading-[27px]">

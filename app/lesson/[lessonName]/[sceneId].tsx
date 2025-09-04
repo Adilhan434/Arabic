@@ -1,4 +1,4 @@
-import Footer from "@/components/forLesson/Footer";
+  import Footer from "@/components/forLesson/Footer";
 // import HeaderForLesson from "@/components/forLesson/HeaderForLesson";
 // import HeaderForLessonSimple from "@/components/forLesson/HeaderForLessonSimple";
 import HeaderForLessonMinimal from "@/components/forLesson/HeaderForLessonMinimal";
@@ -447,7 +447,7 @@ const AudioScene = ({
           </Text>
         ) : (
           <TouchableOpacity
-            className="bg-indigo-500 w-16 h-16 rounded-full justify-center items-center self-center"
+            className="bg-primary w-16 h-16 rounded-full justify-center items-center self-center"
             onPress={handleManualPlay}
             disabled={isLoading || !scene.audio}
           >
