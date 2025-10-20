@@ -7,12 +7,15 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLanguage } from "@/components/LanguageContext";
 
 const AllLessons = () => {
   const router = useRouter();
   const [lessonsProgress, setLessonsProgress] = useState<
     Record<string, number>
   >({});
+  const { t } = useLanguage(); // Добавлено
+
 
   // Загружаем прогресс всех уроков при загрузке экрана
   useFocusEffect(
@@ -104,7 +107,7 @@ const AllLessons = () => {
           {/* Центральная часть - информация об уроке */}
           <View className="flex-1 flex-row items-center justify-center">
             <Text className="font-semibold text-[16px] mr-5 text-center">
-              Lesson {index + 1}:
+              {t('lesson')} {index + 1}:
             </Text>
             <Text className="font-bold text-[38px] font-noto text-center">
               {letter}
@@ -115,7 +118,7 @@ const AllLessons = () => {
     );
   };
 
-  return (
+   return (
     <SafeAreaView className="flex-1 bg-primary">
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-4">
@@ -123,7 +126,7 @@ const AllLessons = () => {
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text className="flex-1 text-center main-font text-white text-[33px] font-bold">
-          All lessons
+          {t('allLessons')}
         </Text>
         <View className="w-8" />
       </View>

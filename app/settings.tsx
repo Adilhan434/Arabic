@@ -53,7 +53,7 @@ export default function Index() {
     
     try {
       const { sound } = await Audio.Sound.createAsync(
-        require('@/assets/audios/click.mp3') // Создайте этот файл или используйте другой
+        require('@/assets/audios/click.mp3')
       );
       setSound(sound);
       await sound.playAsync();
@@ -91,7 +91,6 @@ export default function Index() {
     try {
       await AsyncStorage.setItem("soundEnabled", JSON.stringify(newValue));
       
-      // Воспроизвести звук при переключении, только если включаем звук
       if (newValue) {
         await playSound();
       }
@@ -208,99 +207,133 @@ export default function Index() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center pb-[100px] bg-primary">
-      {/* book and welcome text */}
-      <View className="relative flex items-center w-[345px] h-[347px]">
-        <Image source={icons.main} className="w-[172px] h-[172px]" />
-        <View className="relative -top-6">
-          <View
-            className="absolute w-[345px] h-[189px] bg-black/25 rounded-[38px]"
-            style={{
-              top: 10,
-              left: 10,
-              zIndex: 1,
-            }}
-          />
-          <View
-            style={[styles.shadow, { borderRadius: 38, zIndex: 2 }]}
-            className="w-[345px] h-[189px] justify-around items-center overflow-hidden relative"
-          >
-            <LinearGradient
-              colors={[orange, "#0B503D"]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={StyleSheet.absoluteFill}
-            />
-            <Text className="font-['Seymour One'] mt-3 text-secondary font-normal text-[51px]">
-              {t('mainArabic')}
+    <View className="flex-1 items-center justify-center pb-[50px] bg-primary">
+      {/* Settings Card */}
+      <View className="bg-white w-[90%] max-w-[400px] mt-6 rounded-3xl px-6 py-8 shadow-lg">
+        
+        {/* Header */}
+        <View className="mb-2">
+          <Text className="main-font text-[24px] font-bold text-gray-900 text-center">
+            {t('settings') || "Settings"}
+          </Text>
+          <View className="h-1 w-16 bg-orange-500 rounded-full self-center mt-2" />
+        </View>
+
+        {/* Language Setting */}
+        <View className="mb-6 bg-gray-50 rounded-2xl p-4 border border-gray-100">
+          <Text className="main-font text-[16px] font-semibold mb-3 text-gray-900">
+            {t('language') || "Language"}
+          </Text>
+          <DropdownLanguageSwitch />
+        </View>
+
+        {/* Sound Setting */}
+        <View className="flex-row items-center justify-between mb-6 bg-gray-50 rounded-2xl p-4 border border-gray-100">
+          <View className="flex-1">
+            <Text className="main-font text-[16px] font-semibold text-gray-900 mb-1">
+              {t('sound') || "Sound"}
             </Text>
-            <Text className="main-font text-center mb-[23px] text-secondary text-[20px]">
-              {t('mainEnglish')}
+            <Text className="main-font text-[14px] text-gray-600">
+              {t('soundDescription') || "Enable or disable sound effects"}
             </Text>
           </View>
-        </View>
-      </View>
-      
-      <View className="mt-3 w-[345px] bg-white rounded-[25px] px-4">
-        <DropdownLanguageSwitch />
-        
-        <View className="flex-row items-center justify-between ml-4 items-center py-4">
-          <Text className="text-[21px] font-semibold">{t('sound')}</Text>
           <Switch
             value={isSoundEnabled}
             onValueChange={toggleSound}
-            trackColor={{ false: "#767577", true: orange }}
-            thumbColor={isSoundEnabled ? "#FF6B35" : "#f4f3f4"}
+            trackColor={{ false: "#E5E7EB", true: "#FF6B35" }}
+            thumbColor={"#FFFFFF"}
           />
         </View>
-        <Text className="text-[23px] ml-4 font-bold pb-[15px]">
-          {t('general') }
-        </Text>
-        
-        <TouchableOpacity 
-          className="flex-row items-center justify-between pr-1"
-          onPress={handleResetResults}
-        >
-          <View className="flex-row items-center ml-4">
-            <Image source={ResetImg} className="w-6 h-6 mr-3" />
-            <Text className="text-[21px] font-semibold">{t('resetResults')}</Text>
-          </View>
-          <Image 
-            source={arrowRight} 
-            className="w-5 h-5" 
-            style={{ tintColor: orange }} 
-          />
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          className="flex-row items-center justify-between py-4 pr-1"
-          onPress={handleSendFeedback}
-        >
-          <View className="flex-row items-center ml-4">
-            <Image source={FeedbackImg} className="w-6 h-6 mr-3" />
-            <Text className="text-[21px] font-semibold">{t('sendFeedback')}</Text>
-          </View>
-          <Image 
-            source={arrowRight} 
-            className="w-5 h-5" 
-            style={{ tintColor: orange }} 
-          />
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          className="flex-row items-center justify-between pb-4 pr-1"
-          onPress={handleRecommend}
-        >
-          <View className="flex-row items-center ml-4">
-            <Image source={RecommendImg} className="w-6 h-6 mr-3" />
-            <Text className="text-[21px] font-semibold">{t('recommend')}</Text>
-          </View>
-          <Image 
-            source={arrowRight} 
-            className="w-5 h-5" 
-            style={{ tintColor: orange }} 
-          />
-        </TouchableOpacity>
+
+        {/* Action Buttons Container */}
+        <View className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
+          {/* Reset Progress */}
+          <TouchableOpacity 
+            className="flex-row items-center justify-between py-5 px-4 active:bg-gray-100"
+            onPress={handleResetResults}
+          >
+            <View className="flex-row items-center flex-1">
+              <View className="w-10 h-10 bg-red-50 rounded-xl items-center justify-center mr-3">
+                <Image source={ResetImg} className="w-5 h-5 opacity-80" />
+              </View>
+              <View className="flex-1">
+                <Text className="main-font text-[16px] font-semibold text-gray-900">
+                  {t('resetResults') || "Reset Progress"}
+                </Text>
+                <Text className="main-font text-[13px] text-gray-600 mt-1">
+                  {t('resetDescription') || "Clear all your learning progress"}
+                </Text>
+              </View>
+            </View>
+            <View className="w-8 h-8 bg-gray-200 rounded-full items-center justify-center">
+              <Image 
+                source={arrowRight} 
+                className="w-3 h-3" 
+                style={{ tintColor: "#6B7280" }} 
+              />
+            </View>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View className="h-[1px] bg-gray-200 mx-4" />
+
+          {/* Send Feedback */}
+          <TouchableOpacity 
+            className="flex-row items-center justify-between py-5 px-4 active:bg-gray-100"
+            onPress={handleSendFeedback}
+          >
+            <View className="flex-row items-center flex-1">
+              <View className="w-10 h-10 bg-blue-50 rounded-xl items-center justify-center mr-3">
+                <Image source={FeedbackImg} className="w-5 h-5 opacity-80" />
+              </View>
+              <View className="flex-1">
+                <Text className="main-font text-[16px] font-semibold text-gray-900">
+                  {t('sendFeedback') || "Send Feedback"}
+                </Text>
+                <Text className="main-font text-[13px] text-gray-600 mt-1">
+                  {t('feedbackDescription') || "Share your thoughts with us"}
+                </Text>
+              </View>
+            </View>
+            <View className="w-8 h-8 bg-gray-200 rounded-full items-center justify-center">
+              <Image 
+                source={arrowRight} 
+                className="w-3 h-3" 
+                style={{ tintColor: "#6B7280" }} 
+              />
+            </View>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View className="h-[1px] bg-gray-200 mx-4" />
+
+          {/* Recommend App */}
+          <TouchableOpacity 
+            className="flex-row items-center justify-between py-5 px-4 active:bg-gray-100"
+            onPress={handleRecommend}
+          >
+            <View className="flex-row items-center flex-1">
+              <View className="w-10 h-10 bg-green-50 rounded-xl items-center justify-center mr-3">
+                <Image source={RecommendImg} className="w-5 h-5 opacity-80" />
+              </View>
+              <View className="flex-1">
+                <Text className="main-font text-[16px] font-semibold text-gray-900">
+                  {t('recommend') || "Recommend App"}
+                </Text>
+                <Text className="main-font text-[13px] text-gray-600 mt-1">
+                  {t('recommendDescription') || "Share with friends and family"}
+                </Text>
+              </View>
+            </View>
+            <View className="w-8 h-8 bg-gray-200 rounded-full items-center justify-center">
+              <Image 
+                source={arrowRight} 
+                className="w-3 h-3" 
+                style={{ tintColor: "#6B7280" }} 
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
       
       <Footer />
@@ -311,19 +344,9 @@ export default function Index() {
 const styles = StyleSheet.create({
   shadow: {
     shadowColor: "#000000",
-    shadowOffset: { width: 10, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  activeButton: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
 });

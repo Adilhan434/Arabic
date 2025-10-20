@@ -252,23 +252,24 @@ export const audioYa = {
 
 // audioAssets.ts
 const dummyAudio = require("./assets/audios/dummy.mp3");
+const stock = require("./assets/audios/stocksoundtest.mp3");
 
 // Создаем заглушки для всех букв
 export const audioAlifBa = {
   1: dummyAudio,
-  2: dummyAudio,
+  2: stock,
   3: dummyAudio,
-  4: dummyAudio,
+  4: stock,
   5: dummyAudio,
-  6: dummyAudio,
+  6: stock,
   7: dummyAudio,
-  8: dummyAudio,
+  8: stock,
   9: dummyAudio,
-  10: dummyAudio,
+  10: stock,
   11: dummyAudio,
-  12: dummyAudio,
+  12: stock,
   13: dummyAudio,
-  14: dummyAudio,
+  14: stock,
   15: dummyAudio,
 };
 
