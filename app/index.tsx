@@ -15,6 +15,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useLanguage } from "@/components/LanguageContext";
+
 
 const orange = "#FF6B35";
 
@@ -29,17 +31,19 @@ export default function Index() {
   const [currentScene, setCurrentScene] = useState(1);
   const hadith = getTodayHadith();
   const totalScenesPerLesson = 15; // fixed scenes per lesson
+  const { t } = useLanguage(); // Добавлено
+
   const progressPercent = lessonProgress >= totalScenesPerLesson
     ? 100
     : Math.round((lessonProgress / totalScenesPerLesson) * 100);
 
   function progressTagline(p: number) {
-    if (p === 100) return "Ready to revise & teach others.";
-    if (p >= 70) return "Strong pace — finish this lesson soon.";
-    if (p >= 40) return "Keep building mastery step by step.";
-    if (p > 0) return "Great start — consistency wins.";
-    return "Begin now — first scene is the doorway.";
-  }
+  if (p === 100) return t("100%");
+  if (p >= 70) return t("70%+");
+  if (p >= 40) return t("40%+");
+  if (p > 0) return t("0%+");
+  return t("not_started");
+}
 
   // Загружаем сохраненный прогресс при загрузке экрана
   useFocusEffect(
@@ -114,7 +118,7 @@ export default function Index() {
           <View className="flex flex-col" style={{maxWidth: 170}}>
             <View className="flex-row flex-wrap items-end">
               <Text className="main-font text-[18px] font-semibold leading-[22px]">
-                Lesson {currentLesson.index}:
+                {t('lesson')} {currentLesson.index}:
               </Text>
               <Text className="main-font text-[18px] font-semibold leading-[22px] ml-1">
                 {currentLesson.letter}
@@ -140,7 +144,7 @@ export default function Index() {
             }}
           >
             <Text className="text-white font-semibold text-[16px] main-font">
-              Continue
+              {t('continue')}
             </Text>
           </Pressable>
         </View>
@@ -154,7 +158,7 @@ export default function Index() {
             >
               <Image source={icons.book} />
               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-                Alphabet
+                                {t('alphabet')}
               </Text>
             </Pressable>
 
@@ -174,7 +178,7 @@ export default function Index() {
             >
               <Image className="w-[41px] h-[41px]" source={icons.all_lessons} />
               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-                All lessons
+                {t('allLessons')}
               </Text>
             </TouchableOpacity>
 
@@ -186,7 +190,7 @@ export default function Index() {
             >
               <Image className="w-[41px] h-[41px]" source={icons.approval} />
               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-                Tests
+                {t('tests')}
               </Text>
             </Pressable>
           </View>

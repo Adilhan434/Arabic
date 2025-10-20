@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useLanguage } from "@/components/LanguageContext";
 import {
     ActivityIndicator,
     FlatList,
@@ -63,8 +64,8 @@ const TestScene = () => {
 	const lessonKey = letter as keyof typeof lessons;
 	const lessonScenes = lessons[lessonKey];
 	const variantId = (sceneId as string) || "1"; // используем как seed
-
-	const [currentQuestion, setCurrentQuestion] = useState(0);
+	const {t} = useLanguage();
+ 	const [currentQuestion, setCurrentQuestion] = useState(0);
 	const [selectedOption, setSelectedOption] = useState<number | null>(null);
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 	const [soundLoading, setSoundLoading] = useState(false);
@@ -173,7 +174,7 @@ const TestScene = () => {
 	if (!lessonScenes || questions.length === 0) {
 		return (
 			<SafeAreaView className="flex-1 items-center justify-center bg-white">
-				<Text>Нет данных для теста</Text>
+				<Text>{t('no_available_data_for_test')}</Text>
 			</SafeAreaView>
 		);
 	}
@@ -194,10 +195,10 @@ const TestScene = () => {
 				{!showSummary && (
 					<>
 						<Text className="text-base font-medium mb-2 text-gray-500 text-center">
-							Вопрос {currentQuestion + 1} / {questions.length} · Очки: {score}
+              					{t('question')} {currentQuestion + 1} / {questions.length} · {t('score')}: {score}
 						</Text>
 						<Text className="text-xl font-semibold mb-4 text-gray-800 text-center">
-							{q.mode === "TEXT_TO_AUDIO" ? "Выберите правильную озвучку" : "Прослушайте и выберите правильный текст"}
+							 {q.mode === "TEXT_TO_AUDIO" ? t('selectCorrectAudio') : t('listenAndSelectText')}
 						</Text>
 						<View className="items-center mb-6">
 							{q.mode === "TEXT_TO_AUDIO" ? (
@@ -267,15 +268,14 @@ const TestScene = () => {
 					<View className="flex-1 items-center justify-center">
 						<Text className="text-3xl font-bold mb-4">Результат</Text>
 						<Text className="text-xl mb-6">
-							Вы набрали {score} из {questions.length} ({Math.round((score / questions.length) * 100)}%)
+							{t('you_got')} {score} {t('from')} {questions.length} ({Math.round((score / questions.length) * 100)}%)
 						</Text>
-						{saving && <Text className="text-sm text-gray-500 mb-2">Сохранение...</Text>}
-						<Pressable onPress={restart} className="bg-primary px-8 py-3 rounded-full mb-3">
-							<Text className="text-white font-semibold text-base">Пройти снова</Text>
-						</Pressable>
-						<Pressable onPress={() => router.push(`/` as any)} className="bg-black px-8 py-3 rounded-full">
-							<Text className="text-white font-semibold text-base">На главную</Text>
-						</Pressable>
+							<Pressable onPress={restart} className="bg-primary px-8 py-3 rounded-full mb-3">
+							<Text className="text-white font-semibold text-base">{t('tryAgain')}</Text>
+							</Pressable>
+							<Pressable onPress={() => router.push(`/` as any)} className="bg-black px-8 py-3 rounded-full">
+							<Text className="text-white font-semibold text-base">{t('goHome')}</Text>
+							</Pressable>
 					</View>
 				)}
 			</View>

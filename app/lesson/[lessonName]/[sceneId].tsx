@@ -7,6 +7,7 @@ import { setLessonProgress } from "@/utils/lessonProgress";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEvent } from "expo";
+import { useLanguage } from "@/components/LanguageContext";
 import { Audio } from "expo-av";
 import { useLocalSearchParams } from "expo-router";
 import { useVideoPlayer, VideoView } from "expo-video";
@@ -49,6 +50,7 @@ const SceneId = () => {
   const lessonKey = lessonName as keyof typeof lessons;
   const scene = lessons[lessonKey]?.[id];
   const title = lessons[lessonKey]?.[0] as string;
+  const { t } = useLanguage();
 
   // Сохраняем прогресс при изменении сцены
   useEffect(() => {
@@ -140,6 +142,7 @@ const VideoScene = ({
   const { status } = useEvent(player, "statusChange", {
     status: player.status,
   });
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (status === "error") {
@@ -218,7 +221,7 @@ const VideoScene = ({
             }}
           >
             <Text style={{ color: "red", marginBottom: 12 }}>
-              Ошибка загрузки видео
+              {t('videoLoadError')}
             </Text>
             <TouchableOpacity
               onPress={handleRetry}
@@ -233,7 +236,7 @@ const VideoScene = ({
             >
               <Ionicons name="reload" size={20} color="white" />
               <Text style={{ color: "white", marginLeft: 8 }}>
-                Попробовать снова
+                 {t('tryAgain')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -275,6 +278,8 @@ const AudioScene = ({
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const isMounted = useRef(true);
+  const { t } = useLanguage();
+
 
   const AUTO_PLAY_KEY = "autoPlayEnabled";
 
@@ -443,7 +448,7 @@ const AudioScene = ({
 
         {hasError ? (
           <Text className="text-red-500 text-center mb-4">
-            Ошибка загрузки аудио. Пожалуйста, попробуйте снова.
+               {t('audioLoadError')}
           </Text>
         ) : (
           <TouchableOpacity
@@ -465,7 +470,7 @@ const AudioScene = ({
       </ScrollView>
 
       <View className="flex-row justify-center items-center py-6 border-t border-gray-200">
-        <Text className="text-base mr-3">Автовоспроизведение:</Text>
+        <Text className="text-base mr-3">{t('autoPlay')}:</Text>
         <Switch
           trackColor={{ false: "#e5e7eb", true: "#a5b4fc" }}
           thumbColor={isEnabled ? "#4f46e5" : "#f3f4f6"}

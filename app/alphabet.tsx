@@ -3,6 +3,8 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLanguage } from "@/components/LanguageContext";
+
 
 interface Letter {
   name: string;
@@ -46,16 +48,18 @@ const arabicAlphabet: Letter[] = [
 
 const Alphabet = () => {
   const router = useRouter();
+  const { t } = useLanguage(); // Добавлено
+
 
   const renderTableHeader = () => {
     return (
       <View className="bg-primary rounded-lg mx-4 mb-3 p-3">
         <View className="flex-row">
-          <Text className="text-white font-bold text-sm flex-1 text-center">Name</Text>
-          <Text className="text-white font-bold text-sm flex-1 text-center">Isolated</Text>
-          <Text className="text-white font-bold text-sm flex-1 text-center">Initial</Text>
-          <Text className="text-white font-bold text-sm flex-1 text-center">Medial</Text>
-          <Text className="text-white font-bold text-sm flex-1 text-center">Final</Text>
+          <Text className="text-white font-bold text-sm flex-1 text-center">{t('name')}</Text>
+          <Text className="text-white font-bold text-sm flex-1 text-center">{t('isolated')}</Text>
+          <Text className="text-white font-bold text-sm flex-1 text-center">{t('initial')}</Text>
+          <Text className="text-white font-bold text-sm flex-1 text-center">{t('medial')}</Text>
+          <Text className="text-white font-bold text-sm flex-1 text-center">{t('final')}</Text>
         </View>
       </View>
     );
@@ -116,7 +120,7 @@ const Alphabet = () => {
     );
   };
 
-  return (
+    return (
     <SafeAreaView className="flex-1 bg-primary">
       {/* Header */}
       <View className="px-4 pt-2 pb-6">
@@ -132,10 +136,10 @@ const Alphabet = () => {
             الأبجدية العربية
           </Text>
           <Text className="text-white/80 text-lg main-font">
-            Arabic Alphabet
+            {t('arabicAlphabet')}
           </Text>
           <View className="bg-orange/20 rounded-full px-4 py-1 mt-2">
-            <Text className="text-orange font-semibold text-sm">28 Letters</Text>
+            <Text className="text-orange font-semibold text-sm">{t('lettersCount' +  ' 28' )}</Text>
           </View>
         </View>
       </View>
