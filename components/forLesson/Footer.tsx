@@ -1,4 +1,5 @@
 import { icons } from "@/consonants.js";
+import { playInterfaceSound } from "@/utils/soundUtils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { Image, Pressable, View } from "react-native";
@@ -42,6 +43,7 @@ const Footer = () => {
   };
 
   const handleNext = async () => {
+    await playInterfaceSound();
     await stopCurrentMedia();
     if (currentId < 15) {
       router.push(`/lesson/${lessonName}/${currentId + 1}`);
@@ -51,6 +53,7 @@ const Footer = () => {
   };
 
   const handlePrevious = async () => {
+    await playInterfaceSound();
     await stopCurrentMedia();
     if (currentId > 1) {
       router.push(`/lesson/${lessonName}/${currentId - 1}`);
@@ -68,7 +71,7 @@ const Footer = () => {
         alignItems: "center",
         justifyContent: "space-between",
       }}
-      className='bg-primary'
+      className="bg-primary"
     >
       <Pressable
         onPress={handlePrevious}
@@ -77,7 +80,7 @@ const Footer = () => {
           opacity: pressed || currentId <= 1 ? 0.5 : 1,
         })}
       >
-        <Image source={icons.left_circle} style={{width:38, height:38}} />
+        <Image source={icons.left_circle} style={{ width: 38, height: 38 }} />
       </Pressable>
 
       <Pressable
@@ -86,7 +89,7 @@ const Footer = () => {
           opacity: pressed ? 0.5 : 1,
         })}
       >
-        <Image source={icons.right_circle}  style={{width:38, height:38}} />
+        <Image source={icons.right_circle} style={{ width: 38, height: 38 }} />
       </Pressable>
     </View>
   );

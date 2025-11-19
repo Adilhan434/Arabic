@@ -1,7 +1,9 @@
 import Footer from "@/components/Footer";
+import { useLanguage } from "@/components/LanguageContext";
 import { icons } from "@/consonants.js";
 import { getTodayHadith } from "@/hadiths";
 import { getCurrentScene, getLessonProgress } from "@/utils/lessonProgress";
+import { playInterfaceSound } from "@/utils/soundUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,8 +17,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useLanguage } from "@/components/LanguageContext";
-
 
 const orange = "#FF6B35";
 
@@ -33,17 +33,18 @@ export default function Index() {
   const totalScenesPerLesson = 15; // fixed scenes per lesson
   const { t } = useLanguage(); // Добавлено
 
-  const progressPercent = lessonProgress >= totalScenesPerLesson
-    ? 100
-    : Math.round((lessonProgress / totalScenesPerLesson) * 100);
+  const progressPercent =
+    lessonProgress >= totalScenesPerLesson
+      ? 100
+      : Math.round((lessonProgress / totalScenesPerLesson) * 100);
 
   function progressTagline(p: number) {
-  if (p === 100) return t("100%");
-  if (p >= 70) return t("70%+");
-  if (p >= 40) return t("40%+");
-  if (p > 0) return t("0%+");
-  return t("not_started");
-}
+    if (p === 100) return t("100%");
+    if (p >= 70) return t("70%+");
+    if (p >= 40) return t("40%+");
+    if (p > 0) return t("0%+");
+    return t("not_started");
+  }
 
   // Загружаем сохраненный прогресс при загрузке экрана
   useFocusEffect(
@@ -115,10 +116,10 @@ export default function Index() {
       <View className="bg-secondary w-[345px] mt-[22px] rounded-[25px] px-[22px] pt-[18px] pb-[22px] min-h-[265px] flex justify-between">
         {/* progress + continue */}
         <View className="flex-row justify-between items-start">
-          <View className="flex flex-col" style={{maxWidth: 170}}>
+          <View className="flex flex-col" style={{ maxWidth: 170 }}>
             <View className="flex-row flex-wrap items-end">
               <Text className="main-font text-[18px] font-semibold leading-[22px]">
-                {t('lesson')} {currentLesson.index}:
+                {t("lesson")} {currentLesson.index}:
               </Text>
               <Text className="main-font text-[18px] font-semibold leading-[22px] ml-1">
                 {currentLesson.letter}
@@ -131,7 +132,6 @@ export default function Index() {
               </Text>
             </View>
             <View className="mt-[10px]">
-              
               <Text className="main-font text-[10px] mt-[8px] text-gray-400 tracking-wide">
                 {progressTagline(progressPercent)}
               </Text>
@@ -139,12 +139,13 @@ export default function Index() {
           </View>
           <Pressable
             className="bg-orange rounded-[32px] px-[20px] h-[44px] items-center justify-center"
-            onPress={() => {
+            onPress={async () => {
+              await playInterfaceSound();
               router.push(`/lesson/${currentLesson.lessonKey}/${currentScene}`);
             }}
           >
             <Text className="text-white font-semibold text-[16px] main-font">
-              {t('continue')}
+              {t("continue")}
             </Text>
           </Pressable>
         </View>
@@ -153,20 +154,31 @@ export default function Index() {
         <View className="mt-[20px] mb-[4px]">
           <View className="flex-row justify-between">
             <Pressable
-              onPress={() => { router.push("/alphabet"); }}
+              onPress={async () => {
+                await playInterfaceSound();
+                router.push("/alphabet");
+              }}
               className="w-[95px] h-[88px] bg-orange/95 rounded-[18px] justify-center items-center"
             >
               <Image source={icons.book} />
               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-                                {t('alphabet')}
+                {t("alphabet")}
               </Text>
             </Pressable>
 
             <TouchableOpacity
               onPress={async () => {
+                await playInterfaceSound();
                 try {
-                  const lessonData = { lessonKey: "alifBa", letter: "ا ب", index: 1 };
-                  await AsyncStorage.setItem("currentLesson", JSON.stringify(lessonData));
+                  const lessonData = {
+                    lessonKey: "alifBa",
+                    letter: "ا ب",
+                    index: 1,
+                  };
+                  await AsyncStorage.setItem(
+                    "currentLesson",
+                    JSON.stringify(lessonData)
+                  );
                   setCurrentLesson(lessonData);
                   router.push("/allLessons");
                 } catch (error) {
@@ -178,19 +190,20 @@ export default function Index() {
             >
               <Image className="w-[41px] h-[41px]" source={icons.all_lessons} />
               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-                {t('allLessons')}
+                {t("allLessons")}
               </Text>
             </TouchableOpacity>
 
             <Pressable
-              onPress={() => {
+              onPress={async () => {
+                await playInterfaceSound();
                 router.push(`/test/${currentLesson.lessonKey}/1` as any);
               }}
               className="w-[95px] h-[88px] bg-orange/95 rounded-[18px] justify-center items-center"
             >
               <Image className="w-[41px] h-[41px]" source={icons.approval} />
               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-                {t('tests')}
+                {t("tests")}
               </Text>
             </Pressable>
           </View>
@@ -212,8 +225,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   pressable: {
-    alignSelf: 'flex-end'
-  }
+    alignSelf: "flex-end",
+  },
 });
 
 const ProgressBar: React.FC<{ percent: number }> = ({ percent }) => {
@@ -231,10 +244,15 @@ const ProgressBar: React.FC<{ percent: number }> = ({ percent }) => {
 };
 
 // Subtle badge component for compact stats
-const InfoBadge: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+const InfoBadge: React.FC<{ label: string; value: string }> = ({
+  label,
+  value,
+}) => {
   return (
     <View className="px-[8px] py-[3px] rounded-[9px] bg-white/10 flex-row items-center">
-      <Text className="main-font text-[10px] font-semibold mr-[4px] text-gray-200">{value}</Text>
+      <Text className="main-font text-[10px] font-semibold mr-[4px] text-gray-200">
+        {value}
+      </Text>
       <Text className="main-font text-[9px] text-gray-300">{label}</Text>
     </View>
   );

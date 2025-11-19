@@ -1,5 +1,7 @@
+import { useLanguage } from "@/components/LanguageContext";
 import { path } from "@/lessonRelated.js";
 import { getLessonProgress } from "@/utils/lessonProgress";
+import { playInterfaceSound } from "@/utils/soundUtils";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
@@ -7,7 +9,6 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLanguage } from "@/components/LanguageContext";
 
 const AllLessons = () => {
   const router = useRouter();
@@ -15,7 +16,6 @@ const AllLessons = () => {
     Record<string, number>
   >({});
   const { t } = useLanguage(); // Добавлено
-
 
   // Загружаем прогресс всех уроков при загрузке экрана
   useFocusEffect(
@@ -50,6 +50,7 @@ const AllLessons = () => {
     letter: string,
     index: number
   ) => {
+    await playInterfaceSound();
     try {
       // Сохраняем выбранный урок в AsyncStorage
       const lessonData = {
@@ -107,7 +108,7 @@ const AllLessons = () => {
           {/* Центральная часть - информация об уроке */}
           <View className="flex-1 flex-row items-center justify-center">
             <Text className="font-semibold text-[16px] mr-5 text-center">
-              {t('lesson')} {index + 1}:
+              {t("lesson")} {index + 1}:
             </Text>
             <Text className="font-bold text-[38px] font-noto text-center">
               {letter}
@@ -118,15 +119,21 @@ const AllLessons = () => {
     );
   };
 
-   return (
+  return (
     <SafeAreaView className="flex-1 bg-primary">
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-4">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2">
+        <TouchableOpacity
+          onPress={async () => {
+            await playInterfaceSound();
+            router.back();
+          }}
+          className="mr-4 p-2"
+        >
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text className="flex-1 text-center main-font text-white text-[33px] font-bold">
-          {t('allLessons')}
+          {t("allLessons")}
         </Text>
         <View className="w-8" />
       </View>

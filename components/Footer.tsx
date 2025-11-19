@@ -1,4 +1,5 @@
 import { icons } from "@/consonants.js";
+import { playInterfaceSound } from "@/utils/soundUtils";
 import { usePathname, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
@@ -28,8 +29,9 @@ const Footer = () => {
     >
       <TouchableOpacity
         className="items-center justify-center h-full"
-        onPress={() => {
+        onPress={async () => {
           if (selectedTab !== "home") {
+            await playInterfaceSound();
             setSelectedTab("home");
             router.push("/");
           }
@@ -43,8 +45,9 @@ const Footer = () => {
 
       <TouchableOpacity
         className="items-center justify-center h-full"
-        onPress={() => {
+        onPress={async () => {
           if (selectedTab !== "settings") {
+            await playInterfaceSound();
             setSelectedTab("settings");
             router.push("/settings");
           }

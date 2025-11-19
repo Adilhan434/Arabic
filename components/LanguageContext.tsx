@@ -1,5 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getCurrentLanguage, setLanguage } from '@/locales';
+import { getCurrentLanguage, setLanguage } from "@/locales";
+import { updateNotificationsForLanguageChange } from "@/utils/notificationUtils";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -7,7 +14,9 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
 interface LanguageProviderProps {
   children: ReactNode;
@@ -15,21 +24,23 @@ interface LanguageProviderProps {
 
 // Коды и названия языков (перенесено сюда)
 export const languages = [
-  { code: 'ru', name: 'Русский', nativeName: 'Русский' },
-  { code: 'en', name: 'English', nativeName: 'English' },
-  { code: 'kg', name: 'Кыргызча', nativeName: 'Кыргызча' }
+  { code: "ru", name: "Русский", nativeName: "Русский" },
+  { code: "en", name: "English", nativeName: "English" },
+  { code: "kg", name: "Кыргызча", nativeName: "Кыргызча" },
 ];
 
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    throw new Error("useLanguage must be used within a LanguageProvider");
   }
   return context;
 };
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [currentLanguage, setCurrentLanguage] = useState<string>('ru');
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({
+  children,
+}) => {
+  const [currentLanguage, setCurrentLanguage] = useState<string>("ru");
 
   useEffect(() => {
     loadLanguage();
@@ -43,10 +54,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   const changeLanguage = async (languageCode: string): Promise<void> => {
     await setLanguage(languageCode);
     setCurrentLanguage(languageCode);
+    // Обновляем уведомления при изменении языка
+    await updateNotificationsForLanguageChange();
   };
 
   const t = (key: string): string => {
-    const { getTranslation } = require('@/locales');
+    const { getTranslation } = require("@/locales");
     return getTranslation(currentLanguage, key);
   };
 

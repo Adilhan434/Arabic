@@ -1,13 +1,14 @@
-  import Footer from "@/components/forLesson/Footer";
+import Footer from "@/components/forLesson/Footer";
 // import HeaderForLesson from "@/components/forLesson/HeaderForLesson";
 // import HeaderForLessonSimple from "@/components/forLesson/HeaderForLessonSimple";
 import HeaderForLessonMinimal from "@/components/forLesson/HeaderForLessonMinimal";
+import { useLanguage } from "@/components/LanguageContext";
 import { lessons } from "@/lessonRelated.js";
 import { setLessonProgress } from "@/utils/lessonProgress";
+import { playInterfaceSound } from "@/utils/soundUtils";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEvent } from "expo";
-import { useLanguage } from "@/components/LanguageContext";
 import { Audio } from "expo-av";
 import { useLocalSearchParams } from "expo-router";
 import { useVideoPlayer, VideoView } from "expo-video";
@@ -177,6 +178,7 @@ const VideoScene = ({
   }, [player]);
 
   const handleRetry = async () => {
+    await playInterfaceSound();
     setHasError(false);
     setIsLoading(true);
     try {
@@ -221,7 +223,7 @@ const VideoScene = ({
             }}
           >
             <Text style={{ color: "red", marginBottom: 12 }}>
-              {t('videoLoadError')}
+              {t("videoLoadError")}
             </Text>
             <TouchableOpacity
               onPress={handleRetry}
@@ -236,7 +238,7 @@ const VideoScene = ({
             >
               <Ionicons name="reload" size={20} color="white" />
               <Text style={{ color: "white", marginLeft: 8 }}>
-                 {t('tryAgain')}
+                {t("tryAgain")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -279,7 +281,6 @@ const AudioScene = ({
   const [hasError, setHasError] = useState(false);
   const isMounted = useRef(true);
   const { t } = useLanguage();
-
 
   const AUTO_PLAY_KEY = "autoPlayEnabled";
 
@@ -398,6 +399,7 @@ const AudioScene = ({
   const handleManualPlay = async () => {
     if (isLoading || hasError || !scene.audio) return;
 
+    await playInterfaceSound();
     try {
       if (!audioRef.current) {
         setIsLoading(true);
@@ -448,7 +450,7 @@ const AudioScene = ({
 
         {hasError ? (
           <Text className="text-red-500 text-center mb-4">
-               {t('audioLoadError')}
+            {t("audioLoadError")}
           </Text>
         ) : (
           <TouchableOpacity
@@ -470,7 +472,7 @@ const AudioScene = ({
       </ScrollView>
 
       <View className="flex-row justify-center items-center py-6 border-t border-gray-200">
-        <Text className="text-base mr-3">{t('autoPlay')}:</Text>
+        <Text className="text-base mr-3">{t("autoPlay")}:</Text>
         <Switch
           trackColor={{ false: "#e5e7eb", true: "#a5b4fc" }}
           thumbColor={isEnabled ? "#4f46e5" : "#f3f4f6"}

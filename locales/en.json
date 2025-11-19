@@ -62,5 +62,19 @@
   "70%+": "70+% - Strong pace — finish this lesson soon.",
   "40%+": "Keep building mastery step by step.",
   "0%+": "Great start — consistency wins.",
-  "not_started": "Begin now — first scene is the doorway."
+  "not_started": "Begin now — first scene is the doorway.",
+  "notifications": "Notifications",
+  "notificationsDescription": "Daily reminders to learn",
+  "notificationTitle": "Time to learn Arabic! 📖",
+  "notification1": "Continue your journey to understanding the language of the Quran 🌟",
+  "notification2": "Every step brings you closer to reading the Holy Quran ✨",
+  "notification3": "Allah's knowledge is infinite - keep learning! 🤲",
+  "notification4": "Practice makes perfect - continue your Arabic lessons today 📚",
+  "notification5": "The best of you are those who learn the Quran and teach it 💫",
+  "notification6": "Take a few minutes to practice Arabic today 🕌",
+  "notification7": "Keep your learning streak alive! Every lesson counts 🌙",
+  "notification8": "Knowledge is light - illuminate your path with Arabic 💡",
+  "notification9": "Your daily Arabic practice is waiting for you! 📖",
+  "notification10": "Small steps lead to great achievements - continue learning! 🎯",
+  "notificationsEnabled": "Daily reminders are now enabled. You will receive motivational messages to continue learning."
 }
