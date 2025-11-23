@@ -3,29 +3,38 @@ import ResetImg from "@/assets/icons/Reset.png";
 import FeedbackImg from "@/assets/icons/send.png";
 import RecommendImg from "@/assets/icons/share.png";
 import DropdownLanguageSwitch from "@/components/DropdownLanguageSwitch";
-import Footer from "@/components/Footer";
 import { useLanguage } from "@/components/LanguageContext";
+import { useTheme } from "@/components/ThemeContext";
 import {
   getNotificationStatus,
   sendTestNotification,
   setNotificationStatus,
 } from "@/utils/notificationUtils";
 import { playInterfaceSound } from "@/utils/soundUtils";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   Alert,
   Image,
   Linking,
+  ScrollView,
   Share,
+  StatusBar,
   Switch,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
+  const router = useRouter();
+  const { t } = useLanguage();
+  const { isDarkMode, toggleTheme, theme } = useTheme();
+  const colors = theme.colors;
   const [currentLesson, setCurrentLesson] = useState({
     lessonKey: "alifBa",
     letter: "ا ب",
@@ -33,8 +42,6 @@ export default function Index() {
   });
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
-
-  const { t } = useLanguage();
 
   useFocusEffect(
     useCallback(() => {
@@ -252,167 +259,296 @@ export default function Index() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center pb-[50px] bg-primary">
-      {/* Settings Card */}
-      <View className="bg-white w-[90%] max-w-[400px] mt-6 rounded-3xl px-6 py-8 shadow-lg">
-        {/* Header */}
-        <View className="mb-2">
-          <Text className="main-font text-[24px] font-bold text-gray-900 text-center">
-            {t("settings") || "Settings"}
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={colors.background} 
+      />
+      
+      {/* Header */}
+      <View style={{ 
+        paddingHorizontal: 16, 
+        paddingVertical: 16, 
+        backgroundColor: colors.card, 
+        borderBottomWidth: 1, 
+        borderBottomColor: colors.cardBorder 
+      }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity
+            onPress={async () => {
+              await playInterfaceSound();
+              router.push("/");
+            }}
+            style={{ 
+              marginRight: 12, 
+              padding: 8, 
+              borderRadius: 20, 
+              backgroundColor: colors.background 
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="arrow-back" size={24} color={colors.font} />
+          </TouchableOpacity>
+          <Text style={{ fontSize: 24, fontWeight: 'bold', color: colors.font, flex: 1 }}>
+            {t("settings")}
           </Text>
-          <View className="h-1 w-16 bg-orange-500 rounded-full self-center mt-2" />
-        </View>
-
-        {/* Language Setting */}
-        <View className="mb-6 bg-gray-50 rounded-2xl p-4 border border-gray-100">
-          <Text className="main-font text-[16px] font-semibold mb-3 text-gray-900">
-            {t("language") || "Language"}
-          </Text>
-          <DropdownLanguageSwitch />
-        </View>
-
-        {/* Sound Setting */}
-        <View className="flex-row items-center justify-between mb-6 bg-gray-50 rounded-2xl p-4 border border-gray-100">
-          <View className="flex-1">
-            <Text className="main-font text-[16px] font-semibold text-gray-900 mb-1">
-              {t("sound") || "Sound"}
-            </Text>
-            <Text className="main-font text-[14px] text-gray-600">
-              {t("soundDescription") || "Enable or disable sound effects"}
-            </Text>
-          </View>
-          <Switch
-            value={isSoundEnabled}
-            onValueChange={toggleSound}
-            trackColor={{ false: "#E5E7EB", true: "#FF6B35" }}
-            thumbColor={"#FFFFFF"}
-          />
-        </View>
-
-        {/* Notifications Setting */}
-        <View className="mb-6 bg-gray-50 rounded-2xl p-4 border border-gray-100">
-          <View className="flex-row items-center justify-between mb-3">
-            <View className="flex-1">
-              <Text className="main-font text-[16px] font-semibold text-gray-900 mb-1">
-                {t("notifications") || "Notifications"}
-              </Text>
-              <Text className="main-font text-[14px] text-gray-600">
-                {t("notificationsDescription") || "Daily reminders to learn"}
-              </Text>
-            </View>
-            <Switch
-              value={isNotificationsEnabled}
-              onValueChange={toggleNotifications}
-              trackColor={{ false: "#E5E7EB", true: "#FF6B35" }}
-              thumbColor={"#FFFFFF"}
-            />
-          </View>
-
-          {/* Test Notification Button */}
-          {isNotificationsEnabled && (
-            <TouchableOpacity
-              className="bg-orange-500 rounded-xl py-3 px-4 mt-2"
-              onPress={handleTestNotification}
-            >
-              <Text className="main-font text-[14px] font-semibold text-white text-center">
-                🔔 Test Notification
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Action Buttons Container */}
-        <View className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
-          {/* Reset Progress */}
-          <TouchableOpacity
-            className="flex-row items-center justify-between py-5 px-4 active:bg-gray-100"
-            onPress={handleResetResults}
-          >
-            <View className="flex-row items-center flex-1">
-              <View className="w-10 h-10 bg-red-50 rounded-xl items-center justify-center mr-3">
-                <Image source={ResetImg} className="w-5 h-5 opacity-80" />
-              </View>
-              <View className="flex-1">
-                <Text className="main-font text-[16px] font-semibold text-gray-900">
-                  {t("resetResults") || "Reset Progress"}
-                </Text>
-                <Text className="main-font text-[13px] text-gray-600 mt-1">
-                  {t("resetDescription") || "Clear all your learning progress"}
-                </Text>
-              </View>
-            </View>
-            <View className="w-8 h-8 bg-gray-200 rounded-full items-center justify-center">
-              <Image
-                source={arrowRight}
-                className="w-3 h-3"
-                style={{ tintColor: "#6B7280" }}
-              />
-            </View>
-          </TouchableOpacity>
-
-          {/* Divider */}
-          <View className="h-[1px] bg-gray-200 mx-4" />
-
-          {/* Send Feedback */}
-          <TouchableOpacity
-            className="flex-row items-center justify-between py-5 px-4 active:bg-gray-100"
-            onPress={handleSendFeedback}
-          >
-            <View className="flex-row items-center flex-1">
-              <View className="w-10 h-10 bg-blue-50 rounded-xl items-center justify-center mr-3">
-                <Image source={FeedbackImg} className="w-5 h-5 opacity-80" />
-              </View>
-              <View className="flex-1">
-                <Text className="main-font text-[16px] font-semibold text-gray-900">
-                  {t("sendFeedback") || "Send Feedback"}
-                </Text>
-                <Text className="main-font text-[13px] text-gray-600 mt-1">
-                  {t("feedbackDescription") || "Share your thoughts with us"}
-                </Text>
-              </View>
-            </View>
-            <View className="w-8 h-8 bg-gray-200 rounded-full items-center justify-center">
-              <Image
-                source={arrowRight}
-                className="w-3 h-3"
-                style={{ tintColor: "#6B7280" }}
-              />
-            </View>
-          </TouchableOpacity>
-
-          {/* Divider */}
-          <View className="h-[1px] bg-gray-200 mx-4" />
-
-          {/* Recommend App */}
-          <TouchableOpacity
-            className="flex-row items-center justify-between py-5 px-4 active:bg-gray-100"
-            onPress={handleRecommend}
-          >
-            <View className="flex-row items-center flex-1">
-              <View className="w-10 h-10 bg-green-50 rounded-xl items-center justify-center mr-3">
-                <Image source={RecommendImg} className="w-5 h-5 opacity-80" />
-              </View>
-              <View className="flex-1">
-                <Text className="main-font text-[16px] font-semibold text-gray-900">
-                  {t("recommend") || "Recommend App"}
-                </Text>
-                <Text className="main-font text-[13px] text-gray-600 mt-1">
-                  {t("recommendDescription") || "Share with friends and family"}
-                </Text>
-              </View>
-            </View>
-            <View className="w-8 h-8 bg-gray-200 rounded-full items-center justify-center">
-              <Image
-                source={arrowRight}
-                className="w-3 h-3"
-                style={{ tintColor: "#6B7280" }}
-              />
-            </View>
-          </TouchableOpacity>
         </View>
       </View>
 
-      <Footer />
-    </View>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+        <View style={{ padding: 16, paddingBottom: 24 }}>
+
+        {/* Language Card */}
+        <View style={{ 
+          backgroundColor: colors.card, 
+          borderRadius: 16, 
+          padding: 20, 
+          marginBottom: 16,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.08,
+          shadowRadius: 8,
+          elevation: 3,
+        }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <View style={{ width: 4, height: 20, backgroundColor: colors.accent, borderRadius: 2, marginRight: 8 }} />
+            <Text style={{ fontSize: 12, fontWeight: '600', color: colors.fontSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>
+              {t("language")}
+            </Text>
+          </View>
+          <DropdownLanguageSwitch />
+        </View>
+
+        {/* Toggles Card */}
+        <View style={{ 
+          backgroundColor: colors.card, 
+          borderRadius: 16, 
+          padding: 20, 
+          marginBottom: 16,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.08,
+          shadowRadius: 8,
+          elevation: 3,
+        }}>
+          {/* Theme Toggle */}
+          <View style={{ 
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            paddingBottom: 16, 
+            borderBottomWidth: 1, 
+            borderBottomColor: colors.cardBorder 
+          }}>
+            <View style={{ flex: 1, marginRight: 16 }}>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.font, marginBottom: 4 }}>
+                {t("theme")}
+              </Text>
+              <Text style={{ fontSize: 14, color: colors.fontSecondary }}>
+                {t("themeDescription")}
+              </Text>
+            </View>
+            <Switch
+              value={isDarkMode}
+              onValueChange={async () => {
+                await playInterfaceSound();
+                await toggleTheme();
+              }}
+              trackColor={{ false: "#E5E7EB", true: colors.accent }}
+              thumbColor={"#FFFFFF"}
+              ios_backgroundColor="#E5E7EB"
+            />
+          </View>
+
+          {/* Sound Toggle */}
+          <View style={{ 
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            paddingTop: 16,
+            paddingBottom: 16, 
+            borderBottomWidth: 1, 
+            borderBottomColor: colors.cardBorder 
+          }}>
+            <View style={{ flex: 1, marginRight: 16 }}>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.font, marginBottom: 4 }}>
+                {t("sound")}
+              </Text>
+              <Text style={{ fontSize: 14, color: colors.fontSecondary }}>
+                {t("soundDescription")}
+              </Text>
+            </View>
+            <Switch
+              value={isSoundEnabled}
+              onValueChange={toggleSound}
+              trackColor={{ false: "#E5E7EB", true: colors.accent }}
+              thumbColor={"#FFFFFF"}
+              ios_backgroundColor="#E5E7EB"
+            />
+          </View>
+
+          {/* Notifications Toggle */}
+          <View style={{ paddingTop: 16 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flex: 1, marginRight: 16 }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.font, marginBottom: 4 }}>
+                  {t("notifications")}
+                </Text>
+                <Text style={{ fontSize: 14, color: colors.fontSecondary }}>
+                  {t("notificationsDescription")}
+                </Text>
+              </View>
+              <Switch
+                value={isNotificationsEnabled}
+                onValueChange={toggleNotifications}
+                trackColor={{ false: "#E5E7EB", true: colors.accent }}
+                thumbColor={"#FFFFFF"}
+                ios_backgroundColor="#E5E7EB"
+              />
+            </View>
+
+            {/* Test Notification Button */}
+            {isNotificationsEnabled && (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: colors.accent,
+                  borderRadius: 12,
+                  paddingVertical: 12,
+                  marginTop: 16,
+                }}
+                onPress={handleTestNotification}
+                activeOpacity={0.8}
+              >
+                <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.font, textAlign: 'center' }}>
+                  🔔 Test Notification
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {/* Actions Card */}
+        <View style={{ 
+          backgroundColor: colors.card, 
+          borderRadius: 16, 
+          overflow: 'hidden',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.08,
+          shadowRadius: 8,
+          elevation: 3,
+        }}>
+          {/* Reset Progress */}
+          <TouchableOpacity
+            style={{ 
+              flexDirection: 'row', 
+              alignItems: 'center', 
+              padding: 16, 
+              borderBottomWidth: 1, 
+              borderBottomColor: colors.cardBorder 
+            }}
+            onPress={handleResetResults}
+            activeOpacity={0.7}
+          >
+            <View style={{ 
+              width: 48, 
+              height: 48, 
+              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+              borderRadius: 24, 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              marginRight: 16 
+            }}>
+              <Image source={ResetImg} style={{ width: 24, height: 24 }} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.font, marginBottom: 4 }}>
+                {t("resetResults")}
+              </Text>
+              <Text style={{ fontSize: 14, color: colors.fontSecondary }}>
+                {t("resetDescription")}
+              </Text>
+            </View>
+            <Image
+              source={arrowRight}
+              style={{ width: 20, height: 20, tintColor: colors.fontLight }}
+            />
+          </TouchableOpacity>
+
+          {/* Send Feedback */}
+          <TouchableOpacity
+            style={{ 
+              flexDirection: 'row', 
+              alignItems: 'center', 
+              padding: 16, 
+              borderBottomWidth: 1, 
+              borderBottomColor: colors.cardBorder 
+            }}
+            onPress={handleSendFeedback}
+            activeOpacity={0.7}
+          >
+            <View style={{ 
+              width: 48, 
+              height: 48, 
+              backgroundColor: 'rgba(59, 130, 246, 0.1)', 
+              borderRadius: 24, 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              marginRight: 16 
+            }}>
+              <Image source={FeedbackImg} style={{ width: 24, height: 24 }} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.font, marginBottom: 4 }}>
+                {t("sendFeedback")}
+              </Text>
+              <Text style={{ fontSize: 14, color: colors.fontSecondary }}>
+                {t("feedbackDescription")}
+              </Text>
+            </View>
+            <Image
+              source={arrowRight}
+              style={{ width: 20, height: 20, tintColor: colors.fontLight }}
+            />
+          </TouchableOpacity>
+
+          {/* Recommend App */}
+          <TouchableOpacity
+            style={{ 
+              flexDirection: 'row', 
+              alignItems: 'center', 
+              padding: 16 
+            }}
+            onPress={handleRecommend}
+            activeOpacity={0.7}
+          >
+            <View style={{ 
+              width: 48, 
+              height: 48, 
+              backgroundColor: 'rgba(34, 197, 94, 0.1)', 
+              borderRadius: 24, 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              marginRight: 16 
+            }}>
+              <Image source={RecommendImg} style={{ width: 24, height: 24 }} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.font, marginBottom: 4 }}>
+                {t("recommend")}
+              </Text>
+              <Text style={{ fontSize: 14, color: colors.fontSecondary }}>
+                {t("recommendDescription")}
+              </Text>
+            </View>
+            <Image
+              source={arrowRight}
+              style={{ width: 20, height: 20, tintColor: colors.fontLight }}
+            />
+          </TouchableOpacity>
+        </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

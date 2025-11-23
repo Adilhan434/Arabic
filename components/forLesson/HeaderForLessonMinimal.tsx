@@ -1,3 +1,4 @@
+import { useTheme } from "@/components/ThemeContext";
 import { icons } from "@/consonants.js";
 import { useRouter } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
@@ -14,6 +15,7 @@ const HeaderForLessonMinimal = ({
   totalScenes = 15,
 }: HeaderForLessonProps) => {
   const router = useRouter();
+  const { theme } = useTheme();
 
   const stopCurrentMediaAndGoHome = async () => {
     try {
@@ -47,30 +49,29 @@ const HeaderForLessonMinimal = ({
 
   return (
     <View>
-      <View className="w-full bg-[#0B503D] h-[100px] px-4 py-3 items-end justify-between flex-row">
+      <View style={{ width: '100%', backgroundColor: theme.colors.card, height: 100, paddingHorizontal: 16, paddingVertical: 12, alignItems: 'flex-end', justifyContent: 'space-between', flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: theme.colors.cardBorder }}>
         <Pressable onPress={stopCurrentMediaAndGoHome}>
           <Image source={icons.left_circle} style={{width: 38, height:38}} />
         </Pressable>
 
-        <View className="flex-row gap-5 justify-center items-center">
-          <Text className="font-extrabold text-[40px] leading-[64px] text-white">
+        <View style={{ flexDirection: 'row', gap: 20, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontWeight: '800', fontSize: 40, lineHeight: 64, color: theme.colors.font }}>
             {header}
           </Text>
-          <Text className="text-white font-normal text-2xl leading-[27px]">
+          <Text style={{ color: theme.colors.fontSecondary, fontWeight: '400', fontSize: 24, lineHeight: 27 }}>
             тамгасы
           </Text>
         </View>
 
-        <View className="w-10 h-10" />
+        <View style={{ width: 40, height: 40 }} />
       </View>
 
       {/* Inline progress bar */}
-      <View className="w-full pt-[7px] bg-gray-50 border-b border-gray-300">
-        <View className="flex-row items-center justify-between mb-0"></View>
-        <View className="w-full h-2 bg-gray-300 overflow-hidden">
+      <View style={{ width: '100%', paddingTop: 7, backgroundColor: theme.colors.background, borderBottomWidth: 1, borderBottomColor: theme.colors.cardBorder }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0 }}></View>
+        <View style={{ width: '100%', height: 8, backgroundColor: theme.colors.cardBorder, overflow: 'hidden' }}>
           <View
-            className="h-full bg-black"
-            style={{ width: `${progressPercent}%` }}
+            style={{ height: '100%', backgroundColor: theme.colors.accent, width: `${progressPercent}%` }}
           />
         </View>
       </View>

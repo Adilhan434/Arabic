@@ -76,5 +76,14 @@
   "notification8": "Knowledge is light - illuminate your path with Arabic 💡",
   "notification9": "Your daily Arabic practice is waiting for you! 📖",
   "notification10": "Small steps lead to great achievements - continue learning! 🎯",
-  "notificationsEnabled": "Daily reminders are now enabled. You will receive motivational messages to continue learning."
+  "notificationsEnabled": "Daily reminders are now enabled. You will receive motivational messages to continue learning.",
+  "lessons": "Lessons",
+  "start": "Start",
+  "review": "Review",
+  "in_progress": "In Progress",
+  "completed": "Completed",
+  "theme": "Theme",
+  "themeDescription": "Switch between light and dark mode",
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode"
 }

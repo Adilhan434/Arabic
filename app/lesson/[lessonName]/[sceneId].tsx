@@ -3,6 +3,7 @@ import Footer from "@/components/forLesson/Footer";
 // import HeaderForLessonSimple from "@/components/forLesson/HeaderForLessonSimple";
 import HeaderForLessonMinimal from "@/components/forLesson/HeaderForLessonMinimal";
 import { useLanguage } from "@/components/LanguageContext";
+import { useTheme } from "@/components/ThemeContext";
 import { lessons } from "@/lessonRelated.js";
 import { setLessonProgress } from "@/utils/lessonProgress";
 import { playInterfaceSound } from "@/utils/soundUtils";
@@ -101,6 +102,7 @@ const VideoScene = ({
   title: string;
   currentScene: number;
 }) => {
+  const { theme } = useTheme();
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -189,8 +191,8 @@ const VideoScene = ({
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <StatusBar barStyle={theme.dark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
       <HeaderForLessonMinimal
         header={title}
         currentScene={currentScene}
@@ -209,7 +211,7 @@ const VideoScene = ({
               borderRadius: 12,
             }}
           >
-            <ActivityIndicator size="large" color="#6366F1" />
+            <ActivityIndicator size="large" color="#C7FF00" />
           </View>
         )}
         {hasError && (
@@ -228,7 +230,7 @@ const VideoScene = ({
             <TouchableOpacity
               onPress={handleRetry}
               style={{
-                backgroundColor: "#6366F1",
+                backgroundColor: "#C7FF00",
                 paddingHorizontal: 16,
                 paddingVertical: 10,
                 borderRadius: 25,
@@ -236,8 +238,8 @@ const VideoScene = ({
                 alignItems: "center",
               }}
             >
-              <Ionicons name="reload" size={20} color="white" />
-              <Text style={{ color: "white", marginLeft: 8 }}>
+              <Ionicons name="reload" size={20} color="#1A1A1A" />
+              <Text style={{ color: "#1A1A1A", marginLeft: 8, fontWeight: "600" }}>
                 {t("tryAgain")}
               </Text>
             </TouchableOpacity>
@@ -274,6 +276,7 @@ const AudioScene = ({
   title: string;
   currentScene: number;
 }) => {
+  const { theme } = useTheme();
   const audioRef = useRef<Audio.Sound | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -429,8 +432,8 @@ const AudioScene = ({
   };
 
   return (
-    <SafeAreaView className="flex-1">
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
+    <SafeAreaView className="flex-1 bg-background">
+      <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
       <HeaderForLessonMinimal
         header={title}
         currentScene={currentScene}
@@ -454,28 +457,29 @@ const AudioScene = ({
           </Text>
         ) : (
           <TouchableOpacity
-            className="bg-primary w-16 h-16 rounded-full justify-center items-center self-center"
+            className="bg-accent w-16 h-16 rounded-full justify-center items-center self-center"
             onPress={handleManualPlay}
             disabled={isLoading || !scene.audio}
           >
             {isLoading ? (
-              <ActivityIndicator size="small" color="white" />
+              <ActivityIndicator size="small" color="#1A1A1A" />
             ) : (
               <Ionicons
                 name={isPlaying ? "pause" : "play"}
                 size={28}
-                color="white"
+                color="#1A1A1A"
               />
             )}
           </TouchableOpacity>
         )}
       </ScrollView>
 
-      <View className="flex-row justify-center items-center py-6 border-t border-gray-200">
-        <Text className="text-base mr-3">{t("autoPlay")}:</Text>
+      <View className="flex-row justify-center items-center py-6 border-t border-card-border bg-card">
+        <Text className="text-base mr-3 text-font">{t("autoPlay")}:</Text>
         <Switch
-          trackColor={{ false: "#e5e7eb", true: "#a5b4fc" }}
-          thumbColor={isEnabled ? "#4f46e5" : "#f3f4f6"}
+          trackColor={{ false: "#E5E7EB", true: "#C7FF00" }}
+          thumbColor={isEnabled ? "#FFFFFF" : "#f3f4f6"}
+          ios_backgroundColor="#E5E7EB"
           value={isEnabled}
           onValueChange={handleAutoPlayChange}
         />

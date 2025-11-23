@@ -1,8 +1,9 @@
 import { LanguageProvider } from "@/components/LanguageContext";
+import { ThemeProvider } from "@/components/ThemeContext";
 import {
-  getNotificationStatus,
-  requestNotificationPermissions,
-  scheduleDailyNotifications,
+    getNotificationStatus,
+    requestNotificationPermissions,
+    scheduleDailyNotifications,
 } from "@/utils/notificationUtils";
 import { Stack } from "expo-router";
 import React, { useEffect } from "react";
@@ -30,13 +31,15 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <LanguageProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: "none", // отключает анимацию для всех экранов
-        }}
-      />
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: "none", // отключает анимацию для всех экранов
+          }}
+        />
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }

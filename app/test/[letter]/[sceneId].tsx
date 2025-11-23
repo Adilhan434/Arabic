@@ -1,5 +1,6 @@
 import HeaderForLessonMinimal from "@/components/forLesson/HeaderForLessonMinimal";
 import { useLanguage } from "@/components/LanguageContext";
+import { useTheme } from "@/components/ThemeContext";
 import { lessons } from "@/lessonRelated.js";
 import { playInterfaceSound } from "@/utils/soundUtils";
 import { Ionicons } from "@expo/vector-icons";
@@ -63,6 +64,7 @@ const seededRandomIndexes = (length: number, seedStr: string): number[] => {
 const TestScene = () => {
   const { letter, sceneId } = useLocalSearchParams();
   const router = useRouter();
+  const { theme } = useTheme();
   const lessonKey = letter as keyof typeof lessons;
   const lessonScenes = lessons[lessonKey];
   const variantId = (sceneId as string) || "1"; // используем как seed
@@ -206,7 +208,7 @@ const TestScene = () => {
 
   if (!lessonScenes || questions.length === 0) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-white">
+      <SafeAreaView className="flex-1 items-center justify-center bg-background">
         <Text>{t("no_available_data_for_test")}</Text>
       </SafeAreaView>
     );
@@ -218,8 +220,8 @@ const TestScene = () => {
     : ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <StatusBar barStyle={theme.dark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
       <HeaderForLessonMinimal
         header={lessonScenes[0] as string}
         currentScene={currentQuestion + 1}
@@ -246,12 +248,12 @@ const TestScene = () => {
               ) : (
                 <Pressable
                   onPress={() => playOption(q.correctItem.audio)}
-                  className="w-24 h-24 rounded-full bg-primary items-center justify-center"
+                  className="w-24 h-24 rounded-full bg-accent items-center justify-center"
                 >
                   {soundLoading ? (
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color="#1A1A1A" />
                   ) : (
-                    <Ionicons name="play" size={34} color="#fff" />
+                    <Ionicons name="play" size={34} color="#1A1A1A" />
                   )}
                 </Pressable>
               )}
@@ -262,16 +264,16 @@ const TestScene = () => {
               keyExtractor={(_, i) => i.toString()}
               renderItem={({ item, index }) => {
                 const isSelected = selectedOption === index;
-                let bg = "bg-white";
+                let bgColor = theme.colors.card;
                 if (feedbackVisible && index === q.correctIndex)
-                  bg = "bg-green-100";
+                  bgColor = theme.dark ? "#065f46" : "#d1fae5";
                 else if (feedbackVisible && isSelected && !isCorrect)
-                  bg = "bg-red-100";
-                else if (isSelected) bg = "bg-indigo-100";
+                  bgColor = theme.dark ? "#7f1d1d" : "#fee2e2";
+                else if (isSelected) bgColor = theme.colors.accent + '33';
                 return (
                   <Pressable
                     onPress={() => handleSelect(index)}
-                    className={`mb-3 border border-gray-300 rounded-xl p-4 flex-row items-center justify-between ${bg}`}
+                    style={{ marginBottom: 12, borderWidth: 1, borderColor: theme.colors.cardBorder, borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: bgColor }}
                   >
                     <Text className="text-3xl font-bold text-gray-900">
                       {item.text}
@@ -283,12 +285,12 @@ const TestScene = () => {
                           e.stopPropagation();
                           playOption(item.audio);
                         }}
-                        className={`ml-4 w-12 h-12 rounded-full ${soundLoading ? "bg-gray-400" : "bg-primary"} items-center justify-center`}
+                        className={`ml-4 w-12 h-12 rounded-full ${soundLoading ? "bg-gray-400" : "bg-accent"} items-center justify-center`}
                       >
                         {soundLoading ? (
-                          <ActivityIndicator size="small" color="#fff" />
+                          <ActivityIndicator size="small" color="#1A1A1A" />
                         ) : (
-                          <Ionicons name="volume-high" size={22} color="#fff" />
+                          <Ionicons name="volume-high" size={22} color="#1A1A1A" />
                         )}
                       </Pressable>
                     )}
@@ -322,9 +324,9 @@ const TestScene = () => {
             </Text>
             <Pressable
               onPress={restart}
-              className="bg-primary px-8 py-3 rounded-full mb-3"
+              className="bg-accent px-8 py-3 rounded-full mb-3"
             >
-              <Text className="text-white font-semibold text-base">
+              <Text className="text-font font-semibold text-base">
                 {t("tryAgain")}
               </Text>
             </Pressable>
@@ -333,9 +335,9 @@ const TestScene = () => {
                 await playInterfaceSound();
                 router.push(`/` as any);
               }}
-              className="bg-black px-8 py-3 rounded-full"
+              className="bg-font px-8 py-3 rounded-full"
             >
-              <Text className="text-white font-semibold text-base">
+              <Text className="text-card font-semibold text-base">
                 {t("goHome")}
               </Text>
             </Pressable>
@@ -343,10 +345,9 @@ const TestScene = () => {
         )}
       </View>
 
-      <View className="w-full h-3 bg-gray-200">
+      <View style={{ width: '100%', height: 12, backgroundColor: theme.colors.cardBorder }}>
         <View
-          className="h-full bg-primary"
-          style={{ width: `${progressPercent}%` }}
+          style={{ height: '100%', backgroundColor: theme.colors.accent, width: `${progressPercent}%` }}
         />
       </View>
     </SafeAreaView>

@@ -1,9 +1,10 @@
 import { useLanguage } from "@/components/LanguageContext";
+import { useTheme } from "@/components/ThemeContext";
 import { playInterfaceSound } from "@/utils/soundUtils";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Letter {
@@ -244,156 +245,128 @@ const arabicAlphabet: Letter[] = [
 
 const Alphabet = () => {
   const router = useRouter();
-  const { t } = useLanguage(); // Добавлено
+  const { theme } = useTheme();
+  const { t } = useLanguage();
 
-  const renderTableHeader = () => {
+  const renderLetterCard = (letter: Letter, index: number) => {
     return (
-      <View className="bg-primary rounded-lg mx-4 mb-3 p-3">
-        <View className="flex-row">
-          <Text className="text-white font-bold text-sm flex-1 text-center">
-            {t("name")}
-          </Text>
-          <Text className="text-white font-bold text-sm flex-1 text-center">
-            {t("isolated")}
-          </Text>
-          <Text className="text-white font-bold text-sm flex-1 text-center">
-            {t("initial")}
-          </Text>
-          <Text className="text-white font-bold text-sm flex-1 text-center">
-            {t("medial")}
-          </Text>
-          <Text className="text-white font-bold text-sm flex-1 text-center">
-            {t("final")}
-          </Text>
+      <View key={index} style={{ paddingHorizontal: 16, marginBottom: 12 }}>
+        <View style={{ ...styles.cardShadow, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16 }}>
+          {/* Header: Letter name and transliteration */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: theme.colors.cardBorder }}>
+            <View>
+              <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.colors.font, marginBottom: 4 }}>
+                {letter.name}
+              </Text>
+              <Text style={{ fontSize: 14, color: theme.colors.fontSecondary }}>
+                {letter.transliteration}
+              </Text>
+            </View>
+            <View style={{ backgroundColor: theme.colors.accent + '20', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 4 }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: theme.colors.font }}>#{index + 1}</Text>
+            </View>
+          </View>
+
+          {/* Letter forms grid */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ alignItems: 'center', flex: 1 }}>
+              <Text style={{ fontSize: 12, color: theme.colors.fontSecondary, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>
+                {t("isolated")}
+              </Text>
+              <View style={{ backgroundColor: theme.colors.background, borderRadius: 8, width: 64, height: 64, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 30, fontWeight: 'bold', color: theme.colors.font }}>
+                  {letter.isolated}
+                </Text>
+              </View>
+            </View>
+
+            <View style={{ alignItems: 'center', flex: 1 }}>
+              <Text style={{ fontSize: 12, color: theme.colors.fontSecondary, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>
+                {t("initial")}
+              </Text>
+              <View style={{ backgroundColor: theme.colors.background, borderRadius: 8, width: 64, height: 64, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 30, fontWeight: 'bold', color: theme.colors.font }}>
+                  {letter.initial}
+                </Text>
+              </View>
+            </View>
+
+            <View style={{ alignItems: 'center', flex: 1 }}>
+              <Text style={{ fontSize: 12, color: theme.colors.fontSecondary, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>
+                {t("medial")}
+              </Text>
+              <View style={{ backgroundColor: theme.colors.background, borderRadius: 8, width: 64, height: 64, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 30, fontWeight: 'bold', color: theme.colors.font }}>
+                  {letter.medial}
+                </Text>
+              </View>
+            </View>
+
+            <View style={{ alignItems: 'center', flex: 1 }}>
+              <Text style={{ fontSize: 12, color: theme.colors.fontSecondary, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>
+                {t("final")}
+              </Text>
+              <View style={{ backgroundColor: theme.colors.background, borderRadius: 8, width: 64, height: 64, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 30, fontWeight: 'bold', color: theme.colors.font }}>
+                  {letter.final}
+                </Text>
+              </View>
+            </View>
+          </View>
         </View>
       </View>
     );
   };
 
-  const renderLetterRow = (letter: Letter, index: number) => {
-    const isEven = index % 2 === 0;
-    return (
-      <TouchableOpacity
-        key={index}
-        className={`mx-4 mb-1 rounded-lg ${isEven ? "bg-white" : "bg-gray-50"}`}
-        style={{
-          shadowColor: "#000000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 2,
-          paddingHorizontal: 12,
-          paddingVertical: 12,
-        }}
-      >
-        <View className="flex-row items-center">
-          {/* Name column */}
-          <View className="flex-1 items-center">
-            <Text className="text-primary font-semibold text-xs text-center">
-              {letter.name}
-            </Text>
-            <Text className="text-gray-500 text-xs text-center mt-1">
-              {letter.transliteration}
-            </Text>
-          </View>
-
-          {/* Isolated column */}
-          <View className="flex-1 items-center">
-            <View className="bg-primary/10 rounded-lg w-10 h-10 items-center justify-center">
-              <Text className="text-gray-500 text-xl font-bold">
-                {letter.isolated}
-              </Text>
-            </View>
-          </View>
-
-          {/* Initial column */}
-          <View className="flex-1 items-center">
-            <View className="bg-primary/10 rounded-lg w-10 h-10 items-center justify-center">
-              <Text className="text-primary text-lg font-bold">
-                {letter.initial}
-              </Text>
-            </View>
-          </View>
-
-          {/* Medial column */}
-          <View className="flex-1 items-center">
-            <View className="bg-primary/10 rounded-lg w-10 h-10 items-center justify-center">
-              <Text className="text-primary text-lg font-bold">
-                {letter.medial}
-              </Text>
-            </View>
-          </View>
-
-          {/* Final column */}
-          <View className="flex-1 items-center">
-            <View className="bg-primary/10 rounded-lg w-10 h-10 items-center justify-center">
-              <Text className="text-primary text-lg font-bold">
-                {letter.final}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
   return (
-    <SafeAreaView className="flex-1 bg-primary">
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       {/* Header */}
-      <View className="px-4 pt-2 pb-6">
-        <View className="flex-row items-center mb-3">
+      <View style={{ paddingHorizontal: 16, paddingVertical: 16, backgroundColor: theme.colors.card, borderBottomWidth: 1, borderBottomColor: theme.colors.cardBorder }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
           <TouchableOpacity
             onPress={async () => {
               await playInterfaceSound();
               router.back();
             }}
-            className="mr-4 p-2"
+            style={{ marginRight: 12, padding: 8 }}
           >
-            <Ionicons name="arrow-back" size={24} color="white" />
+            <Ionicons name="arrow-back" size={24} color={theme.colors.font} />
           </TouchableOpacity>
-          <View className="flex-1" />
-        </View>
-
-        <View className="items-center">
-          <Text className="text-white text-[32px] font-bold mb-2">
-            الأبجدية العربية
-          </Text>
-          <Text className="text-white/80 text-lg main-font">
-            {t("arabicAlphabet")}
-          </Text>
-          <View className="bg-orange/20 rounded-full px-4 py-1 mt-2">
-            <Text className="text-orange font-semibold text-sm">
-              {t("lettersCount" + " 28")}
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.colors.font }}>
+              {t("arabicAlphabet")}
             </Text>
           </View>
+          <View style={{ backgroundColor: theme.colors.accent, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4 }}>
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: theme.colors.font }}>28</Text>
+          </View>
         </View>
+        <Text style={{ fontSize: 30, fontWeight: 'bold', textAlign: 'center', color: theme.colors.font }}>
+          الأبجدية العربية
+        </Text>
       </View>
 
       {/* Content */}
-      <View className="flex-1">
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: 120,
-            paddingTop: 20,
-          }}
-          style={{
-            backgroundColor: "white",
-            borderRadius: 10,
-            marginHorizontal: 16,
-            marginTop: 0,
-          }}
-        >
-          {renderTableHeader()}
-          <View>
-            {arabicAlphabet.map((letter, index) =>
-              renderLetterRow(letter, index)
-            )}
-          </View>
-        </ScrollView>
-      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingVertical: 16, paddingBottom: 100 }}
+      >
+        {arabicAlphabet.map((letter, index) =>
+          renderLetterCard(letter, index)
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  cardShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+});
 
 export default Alphabet;

@@ -1,3 +1,4 @@
+import { useTheme } from "@/components/ThemeContext";
 import { icons } from "@/consonants.js";
 import { playInterfaceSound } from "@/utils/soundUtils";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -6,6 +7,7 @@ import { Image, Pressable, View } from "react-native";
 
 const Footer = () => {
   const router = useRouter();
+  const { theme } = useTheme();
   const { lessonName, sceneId } = useLocalSearchParams<{
     lessonName: string;
     sceneId: string;
@@ -70,8 +72,10 @@ const Footer = () => {
         height: 90,
         alignItems: "center",
         justifyContent: "space-between",
+        borderTopWidth: 1,
+        borderTopColor: theme.colors.cardBorder,
+        backgroundColor: theme.colors.card,
       }}
-      className="bg-primary"
     >
       <Pressable
         onPress={handlePrevious}
