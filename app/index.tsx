@@ -2,6 +2,7 @@ import { useLanguage } from "@/components/LanguageContext";
 import { useTheme } from "@/components/ThemeContext";
 import { icons } from "@/consonants.js";
 import { getTodayHadith } from "@/hadiths";
+import { path } from "@/lessonRelated.js";
 import { getCurrentScene, getLessonProgress } from "@/utils/lessonProgress";
 import { playInterfaceSound } from "@/utils/soundUtils";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,19 +11,17 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  Dimensions,
   Image,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const IS_SMALL_SCREEN = SCREEN_WIDTH < 375 || SCREEN_HEIGHT < 700; // iPhone SE and similar
+const orange = "#FF6B35";
 
 export default function Index() {
   const router = useRouter();
@@ -80,165 +79,163 @@ export default function Index() {
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <StatusBar barStyle={theme.dark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
       
-      <ScrollView 
-        style={{ flex: 1 }} 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: IS_SMALL_SCREEN ? 16 : 24 }}
-      >
-        {/* Logo and Title Section */}
-        <View style={{ alignItems: 'center', paddingTop: IS_SMALL_SCREEN ? 16 : 24, paddingBottom: IS_SMALL_SCREEN ? 12 : 20 }}>
-          <Image 
-            source={icons.main} 
-            style={{ width: IS_SMALL_SCREEN ? 60 : 80, height: IS_SMALL_SCREEN ? 60 : 80, marginBottom: IS_SMALL_SCREEN ? 8 : 12 }} 
-          />
-          <Text style={{ 
-            fontSize: IS_SMALL_SCREEN ? 24 : 32, 
-            fontWeight: 'bold', 
-            color: theme.colors.font,
-            marginBottom: 4
-          }}>
-            Arabic Learning
-          </Text>
-          
-          {/* Settings Button - positioned at top right */}
+      {/* Header */}
+      <View style={{ paddingHorizontal: 16, paddingVertical: 16, backgroundColor: theme.colors.card, borderBottomWidth: 1, borderBottomColor: theme.colors.cardBorder }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+            <Image source={icons.main} style={{ width: 40, height: 40, marginRight: 12 }} />
+            <Text style={{ fontSize: 20, fontWeight: 'bold', color: theme.colors.font }}>{t("appTitle")}</Text>
+          </View>
           <TouchableOpacity
             onPress={async () => {
               await playInterfaceSound();
               router.push("/settings");
             }}
-            style={{ 
-              position: 'absolute',
-              right: 16,
-              top: IS_SMALL_SCREEN ? 16 : 24,
-              width: IS_SMALL_SCREEN ? 36 : 44, 
-              height: IS_SMALL_SCREEN ? 36 : 44, 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              borderRadius: IS_SMALL_SCREEN ? 18 : 22, 
-              backgroundColor: theme.colors.card,
-              ...styles.cardShadow
-            }}
+            style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: theme.colors.background }}
             activeOpacity={0.7}
           >
-            <Ionicons name="settings-outline" size={IS_SMALL_SCREEN ? 20 : 24} color={theme.colors.font} />
+            <Ionicons name="menu" size={24} color={theme.colors.font} />
           </TouchableOpacity>
         </View>
+      </View>
 
-        <View style={{ paddingHorizontal: IS_SMALL_SCREEN ? 12 : 16 }}>
-
-        {/* Daily Hadith Card */}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, justifyContent: 'start' }} showsVerticalScrollIndicator={false}>
+        <View  style={{ paddingHorizontal: 16, paddingVertical: 24 }}>
+            
+        {/* Daily Hadith Card - inDrive style */}
         <View
-          style={{ 
-            ...styles.cardShadow, 
-            backgroundColor: theme.colors.card, 
-            borderRadius: IS_SMALL_SCREEN ? 12 : 16, 
-            padding: IS_SMALL_SCREEN ? 14 : 20, 
-            marginBottom: IS_SMALL_SCREEN ? 12 : 16 
-          }}
+        className="mt-4"
+          style={{ ...styles.cardShadow, backgroundColor: theme.colors.card, borderRadius: 16, padding: 20, marginBottom: 16 }}
         >
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: IS_SMALL_SCREEN ? 8 : 12 }}>
-            <View style={{ width: 4, height: IS_SMALL_SCREEN ? 16 : 20, backgroundColor: theme.colors.accent, borderRadius: 2, marginRight: 8 }} />
-            <Text style={{ 
-              fontSize: IS_SMALL_SCREEN ? 10 : 12, 
-              fontWeight: '600', 
-              color: theme.colors.fontSecondary, 
-              textTransform: 'uppercase', 
-              letterSpacing: 1 
-            }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <View style={{ width: 4, height: 20, backgroundColor: theme.colors.accent, borderRadius: 2, marginRight: 8 }} />
+            <Text style={{ fontSize: 12, fontWeight: '600', color: theme.colors.fontSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>
               {t("hadithOfTheDay")}
             </Text>
           </View>
-          <Text style={{ 
-            fontSize: IS_SMALL_SCREEN ? 16 : 20, 
-            fontFamily: 'Seymour One', 
-            color: theme.colors.font, 
-            marginBottom: IS_SMALL_SCREEN ? 6 : 8, 
-            textAlign: 'center',
-            lineHeight: IS_SMALL_SCREEN ? 24 : 30
-          }}>
+          <Text style={{ fontSize: 20, fontFamily: 'Seymour One', color: theme.colors.font, marginBottom: 8, textAlign: 'center' }}>
             {hadith.arabic}
           </Text>
-          <Text style={{ 
-            fontSize: IS_SMALL_SCREEN ? 12 : 14, 
-            color: theme.colors.fontSecondary, 
-            textAlign: 'center', 
-            marginBottom: IS_SMALL_SCREEN ? 6 : 8,
-            lineHeight: IS_SMALL_SCREEN ? 16 : 20
-          }}>
-            {hadith.english}
+          <Text style={{ fontSize: 14, color: theme.colors.fontSecondary, textAlign: 'center', marginBottom: 8 }}>
+            {t("hadithText")}
           </Text>
-          <View style={{ alignItems: 'center', paddingTop: IS_SMALL_SCREEN ? 6 : 8, borderTopWidth: 1, borderTopColor: theme.colors.cardBorder }}>
-            <Text style={{ fontSize: IS_SMALL_SCREEN ? 10 : 12, color: theme.colors.fontLight, fontStyle: 'italic' }}>
-              Prophet ﷺ {hadith.source ? `• ${hadith.source}` : ""}
+          <View style={{ alignItems: 'center', paddingTop: 8, borderTopWidth: 1, borderTopColor: theme.colors.cardBorder }}>
+            <Text style={{ fontSize: 12, color: theme.colors.fontLight, fontStyle: 'italic' }}>
+              {t("prophet")} ﷺ {hadith.source ? `• ${t("bukhari")}` : ""}
             </Text>
           </View>
         </View>
 
-        {/* Current Lesson Card */}
+        {/* Current Lesson Card - inDrive "offer" style */}
         <View
-          style={{ 
-            ...styles.cardShadow, 
-            backgroundColor: theme.colors.card, 
-            borderRadius: IS_SMALL_SCREEN ? 12 : 16, 
-            padding: IS_SMALL_SCREEN ? 14 : 20, 
-            marginBottom: IS_SMALL_SCREEN ? 12 : 16 
-          }}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: IS_SMALL_SCREEN ? 8 : 12 }}>
+          style={{ ...styles.cardShadow, backgroundColor: theme.colors.card, borderRadius: 16, padding: 20, marginBottom: 16 }}
+        className="mt">
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <View style={{ flex: 1 }}>
-              <Text style={{ 
-                fontSize: IS_SMALL_SCREEN ? 10 : 12, 
-                fontWeight: '600', 
-                color: theme.colors.fontSecondary, 
-                textTransform: 'uppercase', 
-                letterSpacing: 1, 
-                marginBottom: 4 
-              }}>
-                Current Lesson
+              <Text style={{ fontSize: 12, fontWeight: '600', color: theme.colors.fontSecondary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
+                {t("currentLesson")}
               </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' }}>
-                <Text style={{ fontSize: IS_SMALL_SCREEN ? 20 : 24, fontWeight: 'bold', color: theme.colors.font }}>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.colors.font }}>
                   {t("lesson")} {currentLesson.index}
                 </Text>
-                <Text style={{ fontSize: IS_SMALL_SCREEN ? 18 : 20, fontWeight: 'bold', color: theme.colors.font, marginLeft: 8 }}>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', color: theme.colors.font, marginLeft: 8 }}>
                   {currentLesson.letter}
                 </Text>
               </View>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: IS_SMALL_SCREEN ? 10 : 12, color: theme.colors.fontSecondary, marginBottom: 4 }}>Progress</Text>
-              <Text style={{ fontSize: IS_SMALL_SCREEN ? 20 : 24, fontWeight: 'bold', color: theme.colors.accent }}>
+              <Text style={{ fontSize: 12, color: theme.colors.fontSecondary, marginBottom: 4 }}>{t("progress")}</Text>
+              <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.colors.accent }}>
                 {progressPercent}%
               </Text>
             </View>
           </View>
 
           {/* Progress Bar */}
-          <View style={{ marginBottom: IS_SMALL_SCREEN ? 12 : 16 }}>
+          <View style={{ marginBottom: 16 }}>
             <ProgressBar percent={progressPercent} theme={theme} />
-            <Text style={{ fontSize: IS_SMALL_SCREEN ? 10 : 12, color: theme.colors.fontLight, marginTop: 4 }}>
+            <Text style={{ fontSize: 12, color: theme.colors.fontLight, marginTop: 4 }}>
               {progressTagline(progressPercent)}
             </Text>
           </View>
 
-          {/* Continue Button */}
-          <TouchableOpacity
-            style={{ 
-              backgroundColor: theme.colors.accent, 
-              borderRadius: IS_SMALL_SCREEN ? 10 : 12, 
-              paddingVertical: IS_SMALL_SCREEN ? 12 : 16, 
-              alignItems: 'center' 
-            }}
-            onPress={async () => {
-              await playInterfaceSound();
-              router.push(`/lesson/${currentLesson.lessonKey}/${currentScene}`);
-            }}
-            activeOpacity={0.8}
-          >
-            <Text style={{ fontSize: IS_SMALL_SCREEN ? 16 : 18, fontWeight: 'bold', color: theme.colors.font }}>
-              {t("continue")}
-            </Text>
-          </TouchableOpacity>
+          {/* Action Buttons */}
+          {progressPercent >= 100 ? (
+            // Показать две кнопки когда урок завершен
+            <View>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', color: theme.colors.accent, textAlign: 'center', marginBottom: 12 }}>
+                {t("lessonCompleted")}
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <TouchableOpacity
+                  style={{ flex: 1, backgroundColor: theme.colors.accent, borderRadius: 12, paddingVertical: 14, alignItems: 'center' }}
+                  onPress={async () => {
+                    await playInterfaceSound();
+                    router.push(`/test/${currentLesson.lessonKey}/1` as any);
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: theme.colors.font }}>
+                    {t("goToTests")}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{ 
+                    flex: 1, 
+                    backgroundColor: theme.colors.card, 
+                    borderRadius: 12, 
+                    paddingVertical: 14, 
+                    alignItems: 'center',
+                    borderWidth: 2,
+                    borderColor: theme.colors.accent
+                  }}
+                  onPress={async () => {
+                    await playInterfaceSound();
+                    // Найти следующий урок
+                    const currentIndex = path.findIndex(lesson => Object.keys(lesson)[0] === currentLesson.lessonKey);
+                    if (currentIndex !== -1 && currentIndex < path.length - 1) {
+                      const nextLessonObj = path[currentIndex + 1] as any;
+                      const nextLessonKey = Object.keys(nextLessonObj)[0];
+                      const nextLetter = nextLessonObj[nextLessonKey];
+                      const nextLessonData = {
+                        lessonKey: nextLessonKey,
+                        letter: nextLetter,
+                        index: currentIndex + 2,
+                      };
+                      await AsyncStorage.setItem("currentLesson", JSON.stringify(nextLessonData));
+                      setCurrentLesson(nextLessonData);
+                      // Загрузить прогресс следующего урока
+                      const nextProgress = await getLessonProgress(nextLessonKey);
+                      const nextScene = await getCurrentScene(nextLessonKey);
+                      setLessonProgress(nextProgress);
+                      setCurrentScene(nextScene);
+                    }
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: theme.colors.accent }}>
+                    {t("nextLesson")}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            // Показать одну кнопку Continue когда урок не завершен
+            <TouchableOpacity
+              style={{ backgroundColor: theme.colors.accent, borderRadius: 12, paddingVertical: 16, alignItems: 'center' }}
+              onPress={async () => {
+                await playInterfaceSound();
+                router.push(`/lesson/${currentLesson.lessonKey}/${currentScene}`);
+              }}
+              activeOpacity={0.8}
+            >
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: theme.colors.font }}>
+                {t("continue")}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Quick Actions Grid */}
@@ -248,19 +245,11 @@ export default function Index() {
               await playInterfaceSound();
               router.push("/alphabet");
             }}
-            style={{ 
-              ...styles.cardShadow, 
-              flex: 1, 
-              marginRight: IS_SMALL_SCREEN ? 6 : 8, 
-              backgroundColor: theme.colors.card, 
-              borderRadius: IS_SMALL_SCREEN ? 12 : 16, 
-              padding: IS_SMALL_SCREEN ? 12 : 16, 
-              alignItems: 'center' 
-            }}
+            style={{ ...styles.cardShadow, flex: 1, marginRight: 8, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, alignItems: 'center' }}
             activeOpacity={0.7}
           >
-            <Image source={icons.book} style={{ width: IS_SMALL_SCREEN ? 32 : 40, height: IS_SMALL_SCREEN ? 32 : 40, marginBottom: IS_SMALL_SCREEN ? 6 : 8 }} />
-            <Text style={{ fontSize: IS_SMALL_SCREEN ? 12 : 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
+            <Image source={icons.book} style={{ width: 40, height: 40, marginBottom: 8 }} />
+            <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
               {t("alphabet")}
             </Text>
           </TouchableOpacity>
@@ -285,19 +274,11 @@ export default function Index() {
                 router.push("/allLessons");
               }
             }}
-            style={{ 
-              ...styles.cardShadow, 
-              flex: 1, 
-              marginHorizontal: IS_SMALL_SCREEN ? 3 : 4, 
-              backgroundColor: theme.colors.card, 
-              borderRadius: IS_SMALL_SCREEN ? 12 : 16, 
-              padding: IS_SMALL_SCREEN ? 12 : 16, 
-              alignItems: 'center' 
-            }}
+            style={{ ...styles.cardShadow, flex: 1, marginHorizontal: 4, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, alignItems: 'center' }}
             activeOpacity={0.7}
           >
-            <Image style={{ width: IS_SMALL_SCREEN ? 32 : 40, height: IS_SMALL_SCREEN ? 32 : 40, marginBottom: IS_SMALL_SCREEN ? 6 : 8 }} source={icons.all_lessons} />
-            <Text style={{ fontSize: IS_SMALL_SCREEN ? 12 : 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
+            <Image style={{ width: 40, height: 40, marginBottom: 8 }} source={icons.all_lessons} />
+            <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
               {t("allLessons")}
             </Text>
           </TouchableOpacity>
@@ -307,19 +288,11 @@ export default function Index() {
               await playInterfaceSound();
               router.push(`/test/${currentLesson.lessonKey}/1` as any);
             }}
-            style={{ 
-              ...styles.cardShadow, 
-              flex: 1, 
-              marginLeft: IS_SMALL_SCREEN ? 6 : 8, 
-              backgroundColor: theme.colors.card, 
-              borderRadius: IS_SMALL_SCREEN ? 12 : 16, 
-              padding: IS_SMALL_SCREEN ? 12 : 16, 
-              alignItems: 'center' 
-            }}
+            style={{ ...styles.cardShadow, flex: 1, marginLeft: 8, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, alignItems: 'center' }}
             activeOpacity={0.7}
           >
-            <Image style={{ width: IS_SMALL_SCREEN ? 32 : 40, height: IS_SMALL_SCREEN ? 32 : 40, marginBottom: IS_SMALL_SCREEN ? 6 : 8 }} source={icons.approval} />
-            <Text style={{ fontSize: IS_SMALL_SCREEN ? 12 : 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
+            <Image style={{ width: 40, height: 40, marginBottom: 8 }} source={icons.approval} />
+            <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
               {t("tests")}
             </Text>
           </TouchableOpacity>

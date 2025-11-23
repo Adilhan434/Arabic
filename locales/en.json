@@ -14,6 +14,13 @@
   "progressGood": "Keep building mastery step by step.",
   "progressStart": "Great start — consistency wins.",
   "progressBegin": "Begin now — first scene is the doorway.",
+  "hadithOfTheDay": "Hadith of the Day",
+  "appTitle": "Arabic Learning",
+  "prophet": "Prophet",
+  "bukhari": "Bukhari",
+  "currentLesson": "Current Lesson",
+  "progress": "Progress",
+  "hadithText": "The best of you are those who learn the Qur'an and teach it.",
   "alphabet": "Alphabet",
   "tests": "Tests",
   "settings": "Settings",
@@ -85,5 +92,8 @@
   "theme": "Theme",
   "themeDescription": "Switch between light and dark mode",
   "darkMode": "Dark Mode",
-  "lightMode": "Light Mode"
+  "lightMode": "Light Mode",
+  "goToTests": "Go to Tests",
+  "nextLesson": "Next Lesson",
+  "lessonCompleted": "Lesson Completed!"
 }
