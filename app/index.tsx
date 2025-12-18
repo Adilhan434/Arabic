@@ -310,368 +310,149 @@ export default function Index() {
               </Text>
             </View>
 
-            {/* Action Buttons */}
-            {progressPercent >= 100 ? (
-              // Показать две кнопки когда урок завершен
-              <View>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "bold",
-                    color: theme.colors.accent,
-                    textAlign: "center",
-                    marginBottom: 12,
+          {/* Action Buttons */}
+          {progressPercent >= 100 ? (
+            // Показать две кнопки когда урок завершен
+            <View>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', color: theme.colors.accent, textAlign: 'center', marginBottom: 12 }}>
+                {t("lessonCompleted")}
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <TouchableOpacity
+                  style={{ flex: 1, backgroundColor: theme.colors.accent, borderRadius: 12, paddingVertical: 14, alignItems: 'center' }}
+                  onPress={async () => {
+                    await playInterfaceSound();
+                    router.push(`/test/${currentLesson.lessonKey}/1` as any);
                   }}
+                  activeOpacity={0.8}
                 >
-                  {t("lessonCompleted")}
-                </Text>
-                <View style={{ flexDirection: "row", gap: 8 }}>
-                  <TouchableOpacity
-                    style={{
-                      flex: 1,
-                      backgroundColor: theme.colors.accent,
-                      borderRadius: 12,
-                      paddingVertical: 14,
-                      alignItems: "center",
-                    }}
-                    onPress={async () => {
-                      await playInterfaceSound();
-                      router.push(`/test/${currentLesson.lessonKey}/1` as any);
-                    }}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "bold",
-                        color: theme.colors.font,
-                      }}
-                    >
-                      {t("goToTests")}
-                    </Text>
-                  </TouchableOpacity>
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: 'black' }}>
+                    {t("goToTests")}
+                  </Text>
+                </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={{
-                      flex: 1,
-                      backgroundColor: theme.colors.card,
-                      borderRadius: 12,
-                      paddingVertical: 14,
-                      alignItems: "center",
-                      borderWidth: 2,
-                      borderColor: theme.colors.accent,
-                    }}
-                    onPress={async () => {
-                      await playInterfaceSound();
-                      // Найти следующий урок
-                      const currentIndex = path.findIndex(
-                        (lesson) =>
-                          Object.keys(lesson)[0] === currentLesson.lessonKey
-                      );
-                      if (
-                        currentIndex !== -1 &&
-                        currentIndex < path.length - 1
-                      ) {
-                        const nextLessonObj = path[currentIndex + 1] as any;
-                        const nextLessonKey = Object.keys(nextLessonObj)[0];
-                        const nextLetter = nextLessonObj[nextLessonKey];
-                        const nextLessonData = {
-                          lessonKey: nextLessonKey,
-                          letter: nextLetter,
-                          index: currentIndex + 2,
-                        };
-                        await AsyncStorage.setItem(
-                          "currentLesson",
-                          JSON.stringify(nextLessonData)
-                        );
-                        setCurrentLesson(nextLessonData);
-                        // Загрузить прогресс следующего урока
-                        const nextProgress =
-                          await getLessonProgress(nextLessonKey);
-                        const nextScene = await getCurrentScene(nextLessonKey);
-                        setLessonProgress(nextProgress);
-                        setCurrentScene(nextScene);
-                      }
-                    }}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "bold",
-                        color: theme.colors.accent,
-                      }}
-                    >
-                      {t("nextLesson")}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  style={{ 
+                    flex: 1, 
+                    backgroundColor: theme.colors.card, 
+                    borderRadius: 12, 
+                    paddingVertical: 14, 
+                    alignItems: 'center',
+                    borderWidth: 2,
+                    borderColor: theme.colors.accent
+                  }}
+                  onPress={async () => {
+                    await playInterfaceSound();
+                    // Найти следующий урок
+                    const currentIndex = path.findIndex(lesson => Object.keys(lesson)[0] === currentLesson.lessonKey);
+                    if (currentIndex !== -1 && currentIndex < path.length - 1) {
+                      const nextLessonObj = path[currentIndex + 1] as any;
+                      const nextLessonKey = Object.keys(nextLessonObj)[0];
+                      const nextLetter = nextLessonObj[nextLessonKey];
+                      const nextLessonData = {
+                        lessonKey: nextLessonKey,
+                        letter: nextLetter,
+                        index: currentIndex + 2,
+                      };
+                      await AsyncStorage.setItem("currentLesson", JSON.stringify(nextLessonData));
+                      setCurrentLesson(nextLessonData);
+                      // Загрузить прогресс следующего урока
+                      const nextProgress = await getLessonProgress(nextLessonKey);
+                      const nextScene = await getCurrentScene(nextLessonKey);
+                      setLessonProgress(nextProgress);
+                      setCurrentScene(nextScene);
+                    }
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: theme.colors.accent }}>
+                    {t("nextLesson")}
+                  </Text>
+                </TouchableOpacity>
               </View>
-            ) : (
-              // Показать одну кнопку Continue когда урок не завершен
-              <TouchableOpacity
-                style={{
-                  backgroundColor: theme.colors.accent,
-                  borderRadius: 12,
-                  paddingVertical: 16,
-                  alignItems: "center",
-                }}
-                onPress={async () => {
-                  await playInterfaceSound();
-                  router.push(
-                    `/lesson/${currentLesson.lessonKey}/${currentScene}`
-                  );
-                }}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    color: theme.colors.font,
-                  }}
-                >
-                  {t("continue")}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
+            </View>
+          ) : (
+            // Показать одну кнопку Continue когда урок не завершен
+            <TouchableOpacity
+              style={{ backgroundColor: theme.colors.accent, borderRadius: 12, paddingVertical: 16, alignItems: 'center' }}
+              onPress={async () => {
+                await playInterfaceSound();
+                router.push(`/lesson/${currentLesson.lessonKey}/${currentScene}`);
+              }}
+              activeOpacity={0.8}
+            >
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>
+                {t("continue")}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
-          {/* Quick Actions Grid */}
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+        {/* Quick Actions Grid */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <TouchableOpacity
+            onPress={async () => {
+              await playInterfaceSound();
+              router.push("/alphabet");
+            }}
+            style={{ ...styles.cardShadow, flex: 1, marginRight: 8, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, alignItems: 'center' }}
+            activeOpacity={0.7}
           >
-            <TouchableOpacity
-              onPress={async () => {
-                await playInterfaceSound();
-                router.push("/alphabet");
-              }}
-              style={{
-                ...styles.cardShadow,
-                flex: 1,
-                marginRight: 8,
-                backgroundColor: theme.colors.card,
-                borderRadius: 16,
-                padding: 16,
-                alignItems: "center",
-              }}
-              activeOpacity={0.7}
-            >
-              <Image
-                source={icons.book}
-                style={{ width: 40, height: 40, marginBottom: 8, tintColor: theme.colors.font }}
-              />
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  color: theme.colors.font,
-                  textAlign: "center",
-                }}
-              >
-                {t("alphabet")}
-              </Text>
-            </TouchableOpacity>
+            <Image source={icons.book} style={{ width: 40, height: 40, marginBottom: 8, tintColor: theme.colors.font }}   />
+            <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
+              {t("alphabet")}
+            </Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={async () => {
-                await playInterfaceSound();
-                try {
-                  const lessonData = {
-                    lessonKey: "alifBa",
-                    letter: "ا ب",
-                    index: 1,
-                  };
-                  await AsyncStorage.setItem(
-                    "currentLesson",
-                    JSON.stringify(lessonData)
-                  );
-                  setCurrentLesson(lessonData);
-                  router.push("/allLessons");
-                } catch (error) {
-                  console.error("Error saving lesson:", error);
-                  router.push("/allLessons");
-                }
-              }}
-              style={{
-                ...styles.cardShadow,
-                flex: 1,
-                marginHorizontal: 4,
-                backgroundColor: theme.colors.card,
-                borderRadius: 16,
-                padding: 16,
-                alignItems: "center",
-              }}
-              activeOpacity={0.7}
-            >
-              <Image
-                style={{ width: 40, height: 40, marginBottom: 8, tintColor: theme.colors.font }}
-                source={icons.all_lessons}
-              />
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  color: theme.colors.font,
-                  textAlign: "center",
-                }}
-              >
-                {t("allLessons")}
-              </Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            onPress={async () => {
+              await playInterfaceSound();
+              try {
+                const lessonData = {
+                  lessonKey: "alifBa",
+                  letter: "ا ب",
+                  index: 1,
+                };
+                await AsyncStorage.setItem(
+                  "currentLesson",
+                  JSON.stringify(lessonData)
+                );
+                setCurrentLesson(lessonData);
+                router.push("/allLessons");
+              } catch (error) {
+                console.error("Error saving lesson:", error);
+                router.push("/allLessons");
+              }
+            }}
+            style={{ ...styles.cardShadow, flex: 1, marginHorizontal: 4, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, alignItems: 'center' }}
+            activeOpacity={0.7}
+          >
+            <Image style={{ width: 40, height: 40, marginBottom: 8, tintColor: theme.colors.font }} source={icons.all_lessons} />
+            <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
+              {t("allLessons")}
+            </Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={async () => {
-                await playInterfaceSound();
-                router.push(`/test/${currentLesson.lessonKey}/1` as any);
-              }}
-              style={{
-                ...styles.cardShadow,
-                flex: 1,
-                marginLeft: 8,
-                backgroundColor: theme.colors.card,
-                borderRadius: 16,
-                padding: 16,
-                alignItems: "center",
-              }}
-              activeOpacity={0.7}
-            >
-              <Image
-                style={{ width: 40, height: 40, marginBottom: 8, tintColor: theme.colors.font }}
-                source={icons.approval}
-              />
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  color: theme.colors.font,
-                  textAlign: "center",
-                }}
-              >
-                {t("tests")}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={async () => {
+              await playInterfaceSound();
+              router.push(`/test/${currentLesson.lessonKey}/1` as any);
+            }}
+            style={{ ...styles.cardShadow, flex: 1, marginLeft: 8, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, alignItems: 'center' }}
+            activeOpacity={0.7}
+          >
+            <Image style={{ width: 40, height: 40, marginBottom: 8, tintColor: theme.colors.font }} source={icons.approval} />
+            <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
+              {t("tests")}
+            </Text>
+          </TouchableOpacity>
+        </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-//             </Text>
-//             <Text className="main-font text-center text-secondary text-[11px] px-1">
-//               {hadith.english}
-//             </Text>
-//             <View className="items-center mb-[20px] w-full">
-//               <View className="w-[65%] h-[1px] bg-white/40 my-[6px]" />
-//               <Text className="main-font text-center text-[#FFE4B5] text-[12px] font-semibold italic tracking-wide">
-//                 Prophet ﷺ {hadith.source ? `• ${hadith.source}` : ""}
-//               </Text>
-//             </View>
-//           </View>
-//         </View>
-//       </View>
 
-//       {/* statistics and actions (restored redesigned version) */}
-//       <View className="bg-secondary w-[345px] mt-[22px] rounded-[25px] px-[22px] pt-[18px] pb-[22px] min-h-[265px] flex justify-between">
-//         {/* progress + continue */}
-//         <View className="flex-row justify-between items-start">
-//           <View className="flex flex-col" style={{ maxWidth: 170 }}>
-//             <View className="flex-row flex-wrap items-end">
-//               <Text className="main-font text-[18px] font-semibold leading-[22px]">
-//                 {t("lesson")} {currentLesson.index}:
-//               </Text>
-//               <Text className="main-font text-[18px] font-semibold leading-[22px] ml-1">
-//                 {currentLesson.letter}
-//               </Text>
-//             </View>
-//             <View className="flex-row items-center mt-[6px]">
-//               <ProgressBar percent={progressPercent} />
-//               <Text className="main-font text-[11px] font-medium text-gray-600 ml-2">
-//                 {progressPercent}%
-//               </Text>
-//             </View>
-//             <View className="mt-[10px]">
-//               <Text className="main-font text-[10px] mt-[8px] text-gray-400 tracking-wide">
-//                 {progressTagline(progressPercent)}
-//               </Text>
-//             </View>
-//           </View>
-//           <Pressable
-//             className="bg-orange rounded-[32px] px-[20px] h-[44px] items-center justify-center"
-//             onPress={async () => {
-//               await playInterfaceSound();
-//               router.push(`/lesson/${currentLesson.lessonKey}/${currentScene}`);
-//             }}
-//           >
-//             <Text className="text-white font-semibold text-[16px] main-font">
-//               {t("continue")}
-//             </Text>
-//           </Pressable>
-//         </View>
-
-//         {/* actions */}
-//         <View className="mt-[20px] mb-[4px]">
-//           <View className="flex-row justify-between">
-//             <Pressable
-//               onPress={async () => {
-//                 await playInterfaceSound();
-//                 router.push("/alphabet");
-//               }}
-//               className="w-[95px] h-[88px] bg-orange/95 rounded-[18px] justify-center items-center"
-//             >
-//               <Image source={icons.book} />
-//               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-//                 {t("alphabet")}
-//               </Text>
-//             </Pressable>
-
-//             <TouchableOpacity
-//               onPress={async () => {
-//                 await playInterfaceSound();
-//                 try {
-//                   const lessonData = {
-//                     lessonKey: "alifBa",
-//                     letter: "ا ب",
-//                     index: 1,
-//                   };
-//                   await AsyncStorage.setItem(
-//                     "currentLesson",
-//                     JSON.stringify(lessonData)
-//                   );
-//                   setCurrentLesson(lessonData);
-//                   router.push("/allLessons");
-//                 } catch (error) {
-//                   console.error("Error saving lesson:", error);
-//                   router.push("/allLessons");
-//                 }
-//               }}
-//               className="w-[95px] h-[88px] bg-orange/95 rounded-[18px] justify-center items-center"
-//             >
-//               <Image className="w-[41px] h-[41px]" source={icons.all_lessons} />
-//               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-//                 {t("allLessons")}
-//               </Text>
-//             </TouchableOpacity>
-
-//             <Pressable
-//               onPress={async () => {
-//                 await playInterfaceSound();
-//                 router.push(`/test/${currentLesson.lessonKey}/1` as any);
-//               }}
-//               className="w-[95px] h-[88px] bg-orange/95 rounded-[18px] justify-center items-center"
-//             >
-//               <Image className="w-[41px] h-[41px]" source={icons.approval} />
-//               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-//                 {t("tests")}
-//               </Text>
-//             </Pressable>
-//           </View>
-//         </View>
-//       </View>
-//       <Footer></Footer>
-//     </View>
-//   );
-// }
 
 const styles = StyleSheet.create({
   cardShadow: {

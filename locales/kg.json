@@ -14,8 +14,8 @@
   "progressGood": "Өздүкүңүздү кадам сайын өркүндөтүңүз.",
   "progressStart": "Жакшы баштоо — туруктуулук табышат.",
   "progressBegin": "Азыр баштаңыз — биринчи сцена эшик.",
-  "hadithOfTheDay": "Күнүнүн хадиси",
-  "appTitle": "Араб тилин үйрөнүү",
+  "hadithOfTheDay": "Күндүн хадиси",
+  "appTitle": "Куран үйрөнүү",
   "prophet": "Пайгамбар",
   "bukhari": "Бухари",
   "currentLesson": "Учурдагы сабак",
@@ -95,5 +95,12 @@
   "lightMode": "Ачык режим",
   "goToTests": "Тесттерге өтүү",
   "nextLesson": "Кийинки сабак",
-  "lessonCompleted": "Сабак аякталды!"
+  "lessonCompleted": "Сабак аякталды!",
+  "home": "Башкы",
+  "duas": "Дуа",
+  "duasTitle": "Курандан маанилүү дуа",
+  "duasSubtitle": "Бул мольбаларды жаттап, ой жүгүртүңүз.",
+  "duaMeaning": "Мааниси",
+  "duaSource": "Булак",
+  "duaTransliteration": "Транслитерация"
 }

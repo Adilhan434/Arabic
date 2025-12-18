@@ -15,7 +15,11 @@ export async function playInterfaceSound(): Promise<void> {
     if (soundEnabled === null || JSON.parse(soundEnabled) === true) {
       // Если уже есть загруженный звук, выгружаем его
       if (soundObject) {
-        await soundObject.unloadAsync();
+        try {
+          await soundObject.unloadAsync();
+        } catch (e) {
+          console.log("Error releasing previous sound:", e);
+        }
         soundObject = null;
       }
 
@@ -23,19 +27,8 @@ export async function playInterfaceSound(): Promise<void> {
       const { sound } = await Audio.Sound.createAsync(
         require("@/assets/audios/click.mp3")
       );
-
       soundObject = sound;
       await sound.playAsync();
-
-      // Выгружаем звук после воспроизведения
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync();
-          if (soundObject === sound) {
-            soundObject = null;
-          }
-        }
-      });
     }
   } catch (error) {
     console.log("Error playing interface sound:", error);

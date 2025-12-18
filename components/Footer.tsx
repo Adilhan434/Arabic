@@ -5,6 +5,11 @@ import React, { useEffect, useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+declare global {
+  var activeAudio: any;
+  var activeVideoPlayer: any;
+}
+
 const Footer = () => {
   const router = useRouter();
   const pathname = usePathname();
@@ -32,6 +37,23 @@ const Footer = () => {
         onPress={async () => {
           if (selectedTab !== "home") {
             await playInterfaceSound();
+            
+            // Останавливаем активное аудио перед переходом на главную
+            try {
+              if (global.activeAudio) {
+                await global.activeAudio.stopAsync();
+                await global.activeAudio.unloadAsync();
+                global.activeAudio = null;
+              }
+              
+              if (global.activeVideoPlayer) {
+                await global.activeVideoPlayer.pause();
+                global.activeVideoPlayer = null;
+              }
+            } catch (e) {
+              console.log("Error stopping media before going home:", e);
+            }
+            
             setSelectedTab("home");
             router.push("/");
           }

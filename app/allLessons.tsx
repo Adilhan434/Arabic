@@ -17,6 +17,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+declare global {
+  var activeAudio: any;
+  var activeVideoPlayer: any;
+}
+
 const AllLessons = () => {
   const router = useRouter();
   const { theme } = useTheme();
@@ -56,6 +61,23 @@ const AllLessons = () => {
     index: number
   ) => {
     await playInterfaceSound();
+    
+    // Останавливаем активное аудио перед переходом
+    try {
+      if (global.activeAudio) {
+        await global.activeAudio.stopAsync();
+        await global.activeAudio.unloadAsync();
+        global.activeAudio = null;
+      }
+      
+      if (global.activeVideoPlayer) {
+        await global.activeVideoPlayer.pause();
+        global.activeVideoPlayer = null;
+      }
+    } catch (e) {
+      console.log("Error stopping media before lesson selection:", e);
+    }
+    
     try {
       const lessonData = {
         lessonKey,
