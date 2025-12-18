@@ -8,7 +8,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const AllLessons = () => {
@@ -74,40 +80,83 @@ const AllLessons = () => {
     return (
       <View style={{ paddingHorizontal: 16, marginBottom: 12 }}>
         <TouchableOpacity
-          style={{ ...styles.cardShadow, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16 }}
+          style={{
+            ...styles.cardShadow,
+            backgroundColor: theme.colors.card,
+            borderRadius: 16,
+            padding: 16,
+          }}
           onPress={() => {
             handleLessonSelect(lessonKey, letter, index);
           }}
           activeOpacity={0.7}
         >
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             {/* Left: Lesson Info */}
             <View style={{ flex: 1 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 8,
+                }}
+              >
                 <View
                   style={{
                     width: 40,
                     height: 40,
                     borderRadius: 20,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: "center",
+                    justifyContent: "center",
                     marginRight: 12,
-                    backgroundColor: isCompleted ? '#10b981' : isInProgress ? theme.colors.accent : theme.colors.cardBorder
+                    backgroundColor: isCompleted
+                      ? "#10b981"
+                      : isInProgress
+                        ? theme.colors.accent
+                        : theme.colors.cardBorder,
                   }}
                 >
                   {isCompleted ? (
                     <Ionicons name="checkmark" size={24} color="white" />
                   ) : (
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: isInProgress ? theme.colors.font : theme.colors.fontSecondary }}>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: isInProgress
+                          ? theme.colors.font
+                          : theme.colors.fontSecondary,
+                      }}
+                    >
                       {index + 1}
                     </Text>
                   )}
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 12, fontWeight: '500', color: theme.colors.fontSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: "500",
+                      color: theme.colors.fontSecondary,
+                      textTransform: "uppercase",
+                      letterSpacing: 1,
+                    }}
+                  >
                     {t("lesson")} {index + 1}
                   </Text>
-                  <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.colors.font }}>
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      fontWeight: "bold",
+                      color: theme.colors.font,
+                    }}
+                  >
                     {letter}
                   </Text>
                 </View>
@@ -147,7 +196,9 @@ const AllLessons = () => {
               >
                 <Text
                   className={`text-sm font-bold ${
-                    isCompleted || isInProgress ? "text-font" : "text-font-secondary"
+                    isCompleted || isInProgress
+                      ? "text-font"
+                      : "text-font-secondary"
                   }`}
                 >
                   {isCompleted
@@ -167,8 +218,16 @@ const AllLessons = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       {/* Header */}
-      <View style={{ paddingHorizontal: 16, paddingVertical: 16, backgroundColor: theme.colors.card, borderBottomWidth: 1, borderBottomColor: theme.colors.cardBorder }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingVertical: 16,
+          backgroundColor: theme.colors.card,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.colors.cardBorder,
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
             onPress={async () => {
               await playInterfaceSound();
@@ -178,10 +237,23 @@ const AllLessons = () => {
           >
             <Ionicons name="arrow-back" size={24} color={theme.colors.font} />
           </TouchableOpacity>
-          <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.colors.font, flex: 1 }}>
+          <Text
+            style={{
+              fontSize: 24,
+              fontWeight: "bold",
+              color: theme.colors.font,
+              flex: 1,
+            }}
+          >
             {t("allLessons")}
           </Text>
-          <Text style={{ fontSize: 14, fontWeight: '500', color: theme.colors.fontSecondary }}>
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: "500",
+              color: theme.colors.fontSecondary,
+            }}
+          >
             {path.length} {t("lessons")}
           </Text>
         </View>

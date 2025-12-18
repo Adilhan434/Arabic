@@ -40,7 +40,7 @@ export const useLanguage = (): LanguageContextType => {
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   children,
 }) => {
-  const [currentLanguage, setCurrentLanguage] = useState<string>("ru");
+  const [currentLanguage, setCurrentLanguage] = useState<string>("kg");
 
   useEffect(() => {
     loadLanguage();
@@ -57,6 +57,8 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
     // Обновляем уведомления при изменении языка
     await updateNotificationsForLanguageChange();
   };
+
+  
 
   const t = (key: string): string => {
     const { getTranslation } = require("@/locales");

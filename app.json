@@ -12,12 +12,15 @@
       "supportsTablet": true
     },
     "android": {
-      "permissions": ["NOTIFICATIONS"],
+      "permissions": [
+        "NOTIFICATIONS"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.adil2008.arabic"
     },
     "web": {
       "bundler": "metro",
@@ -38,6 +41,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "62ee1849-c1e0-490d-992a-33cd13dba23f"
+      }
     }
   }
 }

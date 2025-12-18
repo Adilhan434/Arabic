@@ -52,7 +52,6 @@ const SceneId = () => {
   const lessonKey = lessonName as keyof typeof lessons;
   const scene = lessons[lessonKey]?.[id];
   const title = lessons[lessonKey]?.[0] as string;
-  const { t } = useLanguage();
 
   // Сохраняем прогресс при изменении сцены
   useEffect(() => {
@@ -192,7 +191,10 @@ const VideoScene = ({
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <StatusBar barStyle={theme.dark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
+      <StatusBar
+        barStyle={theme.dark ? "light-content" : "dark-content"}
+        backgroundColor={theme.colors.background}
+      />
       <HeaderForLessonMinimal
         header={title}
         currentScene={currentScene}
@@ -207,11 +209,11 @@ const VideoScene = ({
               aspectRatio: 16 / 9,
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: "#f3f4f6",
+              backgroundColor: theme.colors.cardBorder,
               borderRadius: 12,
             }}
           >
-            <ActivityIndicator size="large" color="#C7FF00" />
+            <ActivityIndicator size="large" color={theme.colors.accent} />
           </View>
         )}
         {hasError && (
@@ -224,13 +226,18 @@ const VideoScene = ({
               alignItems: "center",
             }}
           >
-            <Text style={{ color: "red", marginBottom: 12 }}>
+            <Text
+              style={{
+                color: theme.dark ? "#ef5350" : "#dc2626",
+                marginBottom: 12,
+              }}
+            >
               {t("videoLoadError")}
             </Text>
             <TouchableOpacity
               onPress={handleRetry}
               style={{
-                backgroundColor: "#C7FF00",
+                backgroundColor: theme.colors.accent,
                 paddingHorizontal: 16,
                 paddingVertical: 10,
                 borderRadius: 25,
@@ -238,8 +245,14 @@ const VideoScene = ({
                 alignItems: "center",
               }}
             >
-              <Ionicons name="reload" size={20} color="#1A1A1A" />
-              <Text style={{ color: "#1A1A1A", marginLeft: 8, fontWeight: "600" }}>
+              <Ionicons name="reload" size={20} color={theme.colors.font} />
+              <Text
+                style={{
+                  color: theme.colors.font,
+                  marginLeft: 8,
+                  fontWeight: "600",
+                }}
+              >
                 {t("tryAgain")}
               </Text>
             </TouchableOpacity>
@@ -432,54 +445,111 @@ const AudioScene = ({
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <StatusBar
+        barStyle={theme.dark ? "light-content" : "dark-content"}
+        backgroundColor={theme.colors.background}
+      />
       <HeaderForLessonMinimal
         header={title}
         currentScene={currentScene}
         totalScenes={15}
       />
 
-      <ScrollView contentContainerClassName="flex-1 items-center justify-center">
+      <ScrollView
+        contentContainerStyle={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         {scene.explain && (
-          <Text className="text-lg text-center text-gray-700 mb-8 px-4">
+          <Text
+            style={{
+              fontSize: 18,
+              textAlign: "center",
+              color: theme.colors.fontSecondary,
+              marginBottom: 32,
+              paddingHorizontal: 16,
+            }}
+          >
             {scene.explain}
           </Text>
         )}
 
-        <Text className="text-black font-noto font-extrabold text-[52px] my-8">
+        <Text
+          style={{
+            color: theme.colors.font,
+            fontWeight: "800",
+            fontSize: 52,
+            marginVertical: 32,
+          }}
+        >
           {scene.text}
         </Text>
 
         {hasError ? (
-          <Text className="text-red-500 text-center mb-4">
+          <Text
+            style={{
+              color: theme.dark ? "#ef5350" : "#dc2626",
+              textAlign: "center",
+              marginBottom: 16,
+            }}
+          >
             {t("audioLoadError")}
           </Text>
         ) : (
           <TouchableOpacity
-            className="bg-accent w-16 h-16 rounded-full justify-center items-center self-center"
+            style={{
+              backgroundColor: theme.colors.accent,
+              width: 64,
+              height: 64,
+              borderRadius: 32,
+              justifyContent: "center",
+              alignItems: "center",
+              alignSelf: "center",
+            }}
             onPress={handleManualPlay}
             disabled={isLoading || !scene.audio}
           >
             {isLoading ? (
-              <ActivityIndicator size="small" color="#1A1A1A" />
+              <ActivityIndicator size="small" color={theme.colors.font} />
             ) : (
               <Ionicons
                 name={isPlaying ? "pause" : "play"}
                 size={28}
-                color="#1A1A1A"
+                color={theme.colors.font}
               />
             )}
           </TouchableOpacity>
         )}
       </ScrollView>
 
-      <View className="flex-row justify-center items-center py-6 border-t border-card-border bg-card">
-        <Text className="text-base mr-3 text-font">{t("autoPlay")}:</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingVertical: 24,
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.cardBorder,
+          backgroundColor: theme.colors.card,
+        }}
+      >
+        <Text
+          style={{ fontSize: 16, marginRight: 12, color: theme.colors.font }}
+        >
+          {t("autoPlay")}:
+        </Text>
         <Switch
-          trackColor={{ false: "#E5E7EB", true: "#C7FF00" }}
-          thumbColor={isEnabled ? "#FFFFFF" : "#f3f4f6"}
-          ios_backgroundColor="#E5E7EB"
+          trackColor={{
+            false: theme.colors.cardBorder,
+            true: theme.colors.accent,
+          }}
+          thumbColor={
+            isEnabled ? theme.colors.secondary : theme.colors.fontLight
+          }
+          ios_backgroundColor={theme.colors.cardBorder}
           value={isEnabled}
           onValueChange={handleAutoPlayChange}
         />

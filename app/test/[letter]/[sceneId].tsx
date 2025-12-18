@@ -69,6 +69,10 @@ const TestScene = () => {
   const lessonScenes = lessons[lessonKey];
   const variantId = (sceneId as string) || "1"; // используем как seed
   const { t } = useLanguage();
+  const redColor = theme.dark ? "#ef5350" : "#dc2626";
+  const greenColor = theme.dark ? "#10b981" : "#059669";
+  const greenLightBg = theme.dark ? "#065f46" : "#d1fae5";
+  const redLightBg = theme.dark ? "#7f1d1d" : "#fee2e2";
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
@@ -76,7 +80,6 @@ const TestScene = () => {
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [score, setScore] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
-  const [saving, setSaving] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
 
   // Пул сцен (только объекты с text)
@@ -168,7 +171,6 @@ const TestScene = () => {
 
   const persistResult = async (finalScore: number) => {
     try {
-      setSaving(true);
       const key = `${RESULT_KEY_PREFIX}${lessonKey}`;
       const record = {
         score: finalScore,
@@ -179,8 +181,6 @@ const TestScene = () => {
       await AsyncStorage.setItem(key, JSON.stringify(record));
     } catch (e) {
       console.error("Save test result error", e);
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -231,29 +231,29 @@ const TestScene = () => {
       <View className="px-5 pt-6 flex-1">
         {!showSummary && (
           <>
-            <Text className="text-base font-medium mb-2 text-gray-500 text-center">
+            <Text style={{ fontSize: 16, fontWeight: "500", marginBottom: 8, color: theme.colors.fontSecondary, textAlign: "center" }}>
               {t("question")} {currentQuestion + 1} / {questions.length} ·{" "}
               {t("score")}: {score}
             </Text>
-            <Text className="text-xl font-semibold mb-4 text-gray-800 text-center">
+            <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 16, color: theme.colors.font, textAlign: "center" }}>
               {q.mode === "TEXT_TO_AUDIO"
                 ? t("selectCorrectAudio")
                 : t("listenAndSelectText")}
             </Text>
-            <View className="items-center mb-6">
+            <View style={{ alignItems: "center", marginBottom: 24 }}>
               {q.mode === "TEXT_TO_AUDIO" ? (
-                <Text className="text-5xl font-extrabold text-black mb-2">
+                <Text style={{ fontSize: 52, fontWeight: "800", color: theme.colors.font, marginBottom: 8 }}>
                   {q.prompt}
                 </Text>
               ) : (
                 <Pressable
                   onPress={() => playOption(q.correctItem.audio)}
-                  className="w-24 h-24 rounded-full bg-accent items-center justify-center"
+                  style={{ width: 96, height: 96, borderRadius: 48, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" }}
                 >
                   {soundLoading ? (
-                    <ActivityIndicator size="small" color="#1A1A1A" />
+                    <ActivityIndicator size="small" color={theme.colors.font} />
                   ) : (
-                    <Ionicons name="play" size={34} color="#1A1A1A" />
+                    <Ionicons name="play" size={34} color={theme.colors.font} />
                   )}
                 </Pressable>
               )}
@@ -266,16 +266,16 @@ const TestScene = () => {
                 const isSelected = selectedOption === index;
                 let bgColor = theme.colors.card;
                 if (feedbackVisible && index === q.correctIndex)
-                  bgColor = theme.dark ? "#065f46" : "#d1fae5";
+                  bgColor = greenLightBg;
                 else if (feedbackVisible && isSelected && !isCorrect)
-                  bgColor = theme.dark ? "#7f1d1d" : "#fee2e2";
+                  bgColor = redLightBg;
                 else if (isSelected) bgColor = theme.colors.accent + '33';
                 return (
                   <Pressable
                     onPress={() => handleSelect(index)}
                     style={{ marginBottom: 12, borderWidth: 1, borderColor: theme.colors.cardBorder, borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: bgColor }}
                   >
-                    <Text className="text-3xl font-bold text-gray-900">
+                    <Text style={{ fontSize: 30, fontWeight: "bold", color: theme.colors.font }}>
                       {item.text}
                     </Text>
                     {q.mode === "TEXT_TO_AUDIO" && (
@@ -285,12 +285,12 @@ const TestScene = () => {
                           e.stopPropagation();
                           playOption(item.audio);
                         }}
-                        className={`ml-4 w-12 h-12 rounded-full ${soundLoading ? "bg-gray-400" : "bg-accent"} items-center justify-center`}
+                        style={{ marginLeft: 16, width: 48, height: 48, borderRadius: 24, backgroundColor: soundLoading ? theme.colors.fontLight : theme.colors.accent, alignItems: "center", justifyContent: "center" }}
                       >
                         {soundLoading ? (
-                          <ActivityIndicator size="small" color="#1A1A1A" />
+                          <ActivityIndicator size="small" color={theme.colors.font} />
                         ) : (
-                          <Ionicons name="volume-high" size={22} color="#1A1A1A" />
+                          <Ionicons name="volume-high" size={22} color={theme.colors.font} />
                         )}
                       </Pressable>
                     )}
@@ -300,15 +300,15 @@ const TestScene = () => {
             />
 
             {feedbackVisible && (
-              <View className="mt-2 items-center">
+              <View style={{ marginTop: 8, alignItems: "center" }}>
                 <Text
-                  className={`text-lg font-medium mb-2 ${isCorrect ? "text-green-600" : "text-red-600"}`}
+                  style={{ fontSize: 18, fontWeight: "500", marginBottom: 8, color: isCorrect ? greenColor : redColor }}
                 >
                   {isCorrect ? "Правильно!" : "Неправильно"}
                 </Text>
-                <View className="flex-row items-center gap-2">
-                  <ActivityIndicator size="small" color="#000" />
-                  <Text className="text-gray-600">Следующий вопрос...</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <ActivityIndicator size="small" color={theme.colors.font} />
+                  <Text style={{ color: theme.colors.fontSecondary }}>Следующий вопрос...</Text>
                 </View>
               </View>
             )}
@@ -316,17 +316,17 @@ const TestScene = () => {
         )}
 
         {showSummary && (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-3xl font-bold mb-4">Результат</Text>
-            <Text className="text-xl mb-6">
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <Text style={{ fontSize: 32, fontWeight: "bold", marginBottom: 16, color: theme.colors.font }}>Результат</Text>
+            <Text style={{ fontSize: 20, marginBottom: 24, color: theme.colors.fontSecondary }}>
               {t("you_got")} {score} {t("from")} {questions.length} (
               {Math.round((score / questions.length) * 100)}%)
             </Text>
             <Pressable
               onPress={restart}
-              className="bg-accent px-8 py-3 rounded-full mb-3"
+              style={{ backgroundColor: theme.colors.accent, paddingHorizontal: 32, paddingVertical: 12, borderRadius: 24, marginBottom: 12 }}
             >
-              <Text className="text-font font-semibold text-base">
+              <Text style={{ color: theme.colors.font, fontWeight: "600", fontSize: 16 }}>
                 {t("tryAgain")}
               </Text>
             </Pressable>
@@ -335,9 +335,9 @@ const TestScene = () => {
                 await playInterfaceSound();
                 router.push(`/` as any);
               }}
-              className="bg-font px-8 py-3 rounded-full"
+              style={{ backgroundColor: theme.colors.font, paddingHorizontal: 32, paddingVertical: 12, borderRadius: 24 }}
             >
-              <Text className="text-card font-semibold text-base">
+              <Text style={{ color: theme.colors.card, fontWeight: "600", fontSize: 16 }}>
                 {t("goHome")}
               </Text>
             </Pressable>
