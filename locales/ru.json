@@ -95,5 +95,12 @@
   "lightMode": "Светлый режим",
   "goToTests": "Перейти к тестам",
   "nextLesson": "Следующий урок",
-  "lessonCompleted": "Урок завершен!"
+  "lessonCompleted": "Урок завершен!",
+  "home": "Главная",
+  "duas": "Дуа",
+  "duasTitle": "Важные дуа из Корана",
+  "duasSubtitle": "Учите и размышляйте над этими мольбами.",
+  "duaMeaning": "Смысл",
+  "duaSource": "Источник",
+  "duaTransliteration": "Транслитерация"
 }

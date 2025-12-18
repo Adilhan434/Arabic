@@ -1,5 +1,4 @@
 import { getCurrentLanguage, setLanguage } from "@/locales";
-import { updateNotificationsForLanguageChange } from "@/utils/notificationUtils";
 import React, {
   createContext,
   ReactNode,
@@ -7,6 +6,13 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { Platform } from "react-native";
+
+// Импортируем функции уведомлений только для нативных платформ
+let notificationUtils: any = {};
+if (Platform.OS !== 'web') {
+  notificationUtils = require("@/utils/notificationUtils");
+}
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -40,7 +46,7 @@ export const useLanguage = (): LanguageContextType => {
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   children,
 }) => {
-  const [currentLanguage, setCurrentLanguage] = useState<string>("ru");
+  const [currentLanguage, setCurrentLanguage] = useState<string>("kg");
 
   useEffect(() => {
     loadLanguage();
@@ -54,8 +60,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   const changeLanguage = async (languageCode: string): Promise<void> => {
     await setLanguage(languageCode);
     setCurrentLanguage(languageCode);
-    // Обновляем уведомления при изменении языка
-    await updateNotificationsForLanguageChange();
+    // Обновляем уведомления при изменении языка (только для нативных платформ)
+    if (Platform.OS !== 'web') {
+      const { updateNotificationsForLanguageChange } = notificationUtils;
+      await updateNotificationsForLanguageChange();
+    }
   };
 
   const t = (key: string): string => {

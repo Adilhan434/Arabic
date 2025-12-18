@@ -15,7 +15,7 @@
   "progressStart": "Great start — consistency wins.",
   "progressBegin": "Begin now — first scene is the doorway.",
   "hadithOfTheDay": "Hadith of the Day",
-  "appTitle": "Arabic Learning",
+  "appTitle": "Quran",
   "prophet": "Prophet",
   "bukhari": "Bukhari",
   "currentLesson": "Current Lesson",
@@ -95,5 +95,12 @@
   "lightMode": "Light Mode",
   "goToTests": "Go to Tests",
   "nextLesson": "Next Lesson",
-  "lessonCompleted": "Lesson Completed!"
+  "lessonCompleted": "Lesson Completed!",
+  "home": "Home",
+  "duas": "Duas",
+  "duasTitle": "Essential Qur'an Duas",
+  "duasSubtitle": "Memorize and reflect on these supplications.",
+  "duaMeaning": "Meaning",
+  "duaSource": "Source",
+  "duaTransliteration": "Transliteration"
 }

@@ -5,9 +5,9 @@ import { lessons } from "@/lessonRelated.js";
 import { playInterfaceSound } from "@/utils/soundUtils";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Audio } from "expo-av";
+import { Audio } from 'expo-av';
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -17,6 +17,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+declare global {
+  var activeAudio: any;
+  var activeVideoPlayer: any;
+}
 
 // ---- Types ----
 interface QuizItem {
@@ -47,7 +52,7 @@ const shuffle = <T,>(arr: T[]): T[] => {
   return copy;
 };
 
-// Дет-ерминированный seed из строки (sceneId) для варианта теста
+// Детерминированный seed из строки (sceneId) для варианта теста
 const seededRandomIndexes = (length: number, seedStr: string): number[] => {
   let seed = 0;
   for (let i = 0; i < seedStr.length; i++)
@@ -77,7 +82,7 @@ const TestScene = () => {
   const [score, setScore] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
   const [saving, setSaving] = useState(false);
-  const soundRef = useRef<Audio.Sound | null>(null);
+  const [sound, setSound] = useState<Audio.Sound | null>(null); // Используем локальное состояние
 
   // Пул сцен (только объекты с text)
   const quizPool: QuizItem[] = useMemo(() => {
@@ -113,42 +118,74 @@ const TestScene = () => {
     });
   }, [quizPool, variantId]);
 
-  // Очистка аудио
+  // Очистка аудио при размонтировании компонента
   useEffect(() => {
     return () => {
-      if (soundRef.current) {
+      const cleanupAudio = async () => {
         try {
-          soundRef.current.stopAsync();
-        } catch {}
-        try {
-          soundRef.current.unloadAsync();
-        } catch {}
-        soundRef.current = null;
-      }
+          // Очищаем локальный звук
+          if (sound) {
+            try {
+              await sound.stopAsync();
+            } catch (e) {
+              console.log("Error stopping sound on unmount:", e);
+            }
+            try {
+              await sound.unloadAsync();
+            } catch (e) {
+              console.log("Error unloading sound on unmount:", e);
+            }
+          }
+          
+          // Очищаем глобальное аудио
+          if (global.activeAudio) {
+            try {
+              await global.activeAudio.stopAsync();
+            } catch (e) {
+              console.log("Error stopping global audio on unmount:", e);
+            }
+            try {
+              await global.activeAudio.unloadAsync();
+            } catch (e) {
+              console.log("Error unloading global audio on unmount:", e);
+            }
+            global.activeAudio = null;
+          }
+        } catch (e) {
+          console.log("Error during audio cleanup on unmount:", e);
+        }
+      };
+      
+      cleanupAudio();
     };
   }, []);
 
   const playOption = async (audio: any) => {
     if (!audio) return;
+    
     try {
-      setSoundLoading(true);
-      if (soundRef.current) {
+      // Останавливаем и выгружаем предыдущий звук
+      if (sound) {
         try {
-          await soundRef.current.stopAsync();
-        } catch {}
-        try {
-          await soundRef.current.unloadAsync();
-        } catch {}
-        soundRef.current = null;
+          await sound.unloadAsync();
+        } catch (e) {
+          console.log("Error releasing previous sound:", e);
+        }
       }
-      const { sound } = await Audio.Sound.createAsync(audio, {
-        shouldPlay: true,
+
+      setSoundLoading(true);
+
+      // Создаем новый звук
+      const { sound: newSound } = await Audio.Sound.createAsync(audio, {
+        shouldPlay: true
       });
-      soundRef.current = sound;
-      global.activeAudio = sound;
+
+      setSound(newSound);
+      global.activeAudio = newSound;
+      setSoundLoading(false);
+      
     } catch (e) {
       console.error("Audio play error", e);
-    } finally {
       setSoundLoading(false);
     }
   };
@@ -190,14 +227,30 @@ const TestScene = () => {
       setSelectedOption(null);
       setIsCorrect(null);
       setFeedbackVisible(false);
+      
+      // Останавливаем звук при переходе к следующему вопросу
+      if (sound) {
+        sound.stopAsync().catch(() => {});
+      }
     } else {
-      persistResult(score + (isCorrect ? 1 : 0));
+      persistResult(score);
       setShowSummary(true);
+      
+      // Останавливаем звук при завершении теста
+      if (sound) {
+        sound.stopAsync().catch(() => {});
+      }
     }
   };
 
   const restart = async () => {
     await playInterfaceSound();
+    
+    // Останавливаем звук при перезапуске
+    if (sound) {
+      sound.stopAsync().catch(() => {});
+    }
+    
     setCurrentQuestion(0);
     setSelectedOption(null);
     setIsCorrect(null);
@@ -208,8 +261,8 @@ const TestScene = () => {
 
   if (!lessonScenes || questions.length === 0) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-background">
-        <Text>{t("no_available_data_for_test")}</Text>
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: theme.colors.background }}>
+        <Text style={{ color: theme.colors.font }}>{t("no_available_data_for_test")}</Text>
       </SafeAreaView>
     );
   }
@@ -231,29 +284,31 @@ const TestScene = () => {
       <View className="px-5 pt-6 flex-1">
         {!showSummary && (
           <>
-            <Text className="text-base font-medium mb-2 text-gray-500 text-center">
+            <Text className="text-base font-medium mb-2 text-center" style={{ color: theme.colors.fontSecondary }}>
               {t("question")} {currentQuestion + 1} / {questions.length} ·{" "}
               {t("score")}: {score}
             </Text>
-            <Text className="text-xl font-semibold mb-4 text-gray-800 text-center">
+            <Text className="text-xl font-semibold mb-4 text-center" style={{ color: theme.colors.fontSecondary }}>
               {q.mode === "TEXT_TO_AUDIO"
                 ? t("selectCorrectAudio")
                 : t("listenAndSelectText")}
             </Text>
             <View className="items-center mb-6">
               {q.mode === "TEXT_TO_AUDIO" ? (
-                <Text className="text-5xl font-extrabold text-black mb-2">
+                <Text className="text-5xl font-extrabold mb-2" style={{ color: theme.colors.font }}>
                   {q.prompt}
                 </Text>
               ) : (
                 <Pressable
                   onPress={() => playOption(q.correctItem.audio)}
-                  className="w-24 h-24 rounded-full bg-accent items-center justify-center"
+                  className="w-24 h-24 rounded-full items-center justify-center"
+                  style={{ backgroundColor: theme.colors.accent }}
+                  disabled={soundLoading}
                 >
                   {soundLoading ? (
-                    <ActivityIndicator size="small" color="#1A1A1A" />
+                    <ActivityIndicator size="small" color={theme.colors.secondary} />
                   ) : (
-                    <Ionicons name="play" size={34} color="#1A1A1A" />
+                    <Ionicons name="play" size={34} color={theme.colors.secondary} />
                   )}
                 </Pressable>
               )}
@@ -273,24 +328,35 @@ const TestScene = () => {
                 return (
                   <Pressable
                     onPress={() => handleSelect(index)}
-                    style={{ marginBottom: 12, borderWidth: 1, borderColor: theme.colors.cardBorder, borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: bgColor }}
+                    style={{ 
+                      marginBottom: 12, 
+                      borderWidth: 1, 
+                      borderColor: theme.colors.cardBorder, 
+                      borderRadius: 12, 
+                      padding: 16, 
+                      flexDirection: 'row', 
+                      alignItems: 'center', 
+                      backgroundColor: bgColor 
+                    }}
+                    disabled={feedbackVisible || showSummary}
                   >
-                    <Text className="text-3xl font-bold text-gray-900">
+                    {q.mode === "AUDIO_TO_TEXT" && <Text className="text-3xl font-bold" style={{ color: theme.colors.font }}>
                       {item.text}
-                    </Text>
+                    </Text>}
                     {q.mode === "TEXT_TO_AUDIO" && (
                       <Pressable
-                        disabled={soundLoading}
+                        disabled={soundLoading || feedbackVisible}
                         onPress={(e) => {
                           e.stopPropagation();
                           playOption(item.audio);
                         }}
-                        className={`ml-4 w-12 h-12 rounded-full ${soundLoading ? "bg-gray-400" : "bg-accent"} items-center justify-center`}
+                        className="ml-4 w-12 h-12 rounded-full items-center justify-center"
+                        style={{ backgroundColor: soundLoading ? theme.colors.cardBorder : theme.colors.accent }}
                       >
                         {soundLoading ? (
-                          <ActivityIndicator size="small" color="#1A1A1A" />
+                          <ActivityIndicator size="small" color={theme.colors.secondary} />
                         ) : (
-                          <Ionicons name="volume-high" size={22} color="#1A1A1A" />
+                          <Ionicons name="volume-high" size={22} color={theme.colors.secondary} />
                         )}
                       </Pressable>
                     )}
@@ -302,13 +368,14 @@ const TestScene = () => {
             {feedbackVisible && (
               <View className="mt-2 items-center">
                 <Text
-                  className={`text-lg font-medium mb-2 ${isCorrect ? "text-green-600" : "text-red-600"}`}
+                  className="text-lg font-medium mb-2"
+                  style={{ color: isCorrect ? (theme.dark ? "#10b981" : "#059669") : (theme.dark ? "#ef4444" : "#dc2626") }}
                 >
-                  {isCorrect ? "Правильно!" : "Неправильно"}
+                  {isCorrect ? t("correct") : t("incorrect")}
                 </Text>
                 <View className="flex-row items-center gap-2">
-                  <ActivityIndicator size="small" color="#000" />
-                  <Text className="text-gray-600">Следующий вопрос...</Text>
+                  <ActivityIndicator size="small" color={theme.colors.font} />
+                  <Text className="text-gray-600" style={{ color: theme.colors.fontSecondary }}>{t("next_question")}</Text>
                 </View>
               </View>
             )}
@@ -317,27 +384,68 @@ const TestScene = () => {
 
         {showSummary && (
           <View className="flex-1 items-center justify-center">
-            <Text className="text-3xl font-bold mb-4">Результат</Text>
-            <Text className="text-xl mb-6">
+            <Text className="text-3xl font-bold mb-4" style={{ color: theme.colors.font }}>{t("result")}</Text>
+            <Text className="text-xl mb-6" style={{ color: theme.colors.fontSecondary }}>
               {t("you_got")} {score} {t("from")} {questions.length} (
               {Math.round((score / questions.length) * 100)}%)
             </Text>
             <Pressable
               onPress={restart}
-              className="bg-accent px-8 py-3 rounded-full mb-3"
+              className="px-8 py-3 rounded-full mb-3"
+              style={{ backgroundColor: theme.colors.accent }}
+              disabled={saving}
             >
-              <Text className="text-font font-semibold text-base">
-                {t("tryAgain")}
-              </Text>
+              {saving ? (
+                <ActivityIndicator size="small" color={theme.colors.secondary} />
+              ) : (
+                <Text className="font-semibold text-base" style={{ color: theme.colors.secondary }}>
+                  {t("tryAgain")}
+                </Text>
+              )}
             </Pressable>
             <Pressable
               onPress={async () => {
                 await playInterfaceSound();
+                
+                // Останавливаем аудио перед выходом на главную
+                try {
+                  if (sound) {
+                    try {
+                      await sound.stopAsync();
+                    } catch (e) {
+                      console.log("Error stopping local sound:", e);
+                    }
+                    try {
+                      await sound.unloadAsync();
+                    } catch (e) {
+                      console.log("Error unloading local sound:", e);
+                    }
+                    setSound(null);
+                  }
+                  
+                  if (global.activeAudio) {
+                    try {
+                      await global.activeAudio.stopAsync();
+                    } catch (e) {
+                      console.log("Error stopping global audio:", e);
+                    }
+                    try {
+                      await global.activeAudio.unloadAsync();
+                    } catch (e) {
+                      console.log("Error unloading global audio:", e);
+                    }
+                    global.activeAudio = null;
+                  }
+                } catch (e) {
+                  console.log("Error stopping media before going home:", e);
+                }
+                
                 router.push(`/` as any);
               }}
-              className="bg-font px-8 py-3 rounded-full"
+              className="px-8 py-3 rounded-full"
+              style={{ backgroundColor: theme.colors.font }}
             >
-              <Text className="text-card font-semibold text-base">
+              <Text className="font-semibold text-base" style={{ color: theme.colors.card }}>
                 {t("goHome")}
               </Text>
             </Pressable>

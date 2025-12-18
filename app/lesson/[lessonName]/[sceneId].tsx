@@ -15,22 +15,22 @@ import { useLocalSearchParams } from "expo-router";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  Dimensions,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Dimensions,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // --- расширяем global для хранения активного аудио и видео плееров
 declare global {
-  var activeAudio: Audio.Sound | null;
-  var activeVideoPlayer: any | null;
+  var activeAudio: any;
+  var activeVideoPlayer: any;
 }
 
 // инициализация
@@ -321,13 +321,16 @@ const AudioScene = ({
 
         // Останавливаем и выгружаем предыдущее аудио
         if (audioRef.current) {
-          await audioRef.current.stopAsync();
-          await audioRef.current.unloadAsync();
+          try {
+            await audioRef.current.unloadAsync();
+          } catch (e) {
+            console.log("Error releasing previous audio:", e);
+          }
           audioRef.current = null;
         }
 
         const { sound } = await Audio.Sound.createAsync(scene.audio, {
-          shouldPlay: false,
+          shouldPlay: false
         });
 
         if (isActive) {
@@ -350,8 +353,11 @@ const AudioScene = ({
       isActive = false;
       const stopAudio = async () => {
         if (audioRef.current) {
-          await audioRef.current.stopAsync();
-          await audioRef.current.unloadAsync();
+          try {
+            await audioRef.current.unloadAsync();
+          } catch (e) {
+            console.log("Error releasing audio:", e);
+          }
           audioRef.current = null;
           if (global.activeAudio === audioRef.current) {
             global.activeAudio = null;
@@ -412,7 +418,7 @@ const AudioScene = ({
       }
 
       const status = await audioRef.current.getStatusAsync();
-      if ("isPlaying" in status && status.isPlaying) {
+      if ('isPlaying' in status && status.isPlaying) {
         await audioRef.current.pauseAsync();
         setIsPlaying(false);
       } else {
@@ -432,8 +438,8 @@ const AudioScene = ({
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
+    <SafeAreaView className="flex-1 " style={{ backgroundColor: theme.colors.background }}>
+      <StatusBar barStyle={theme.dark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
       <HeaderForLessonMinimal
         header={title}
         currentScene={currentScene}
@@ -442,44 +448,45 @@ const AudioScene = ({
 
       <ScrollView contentContainerClassName="flex-1 items-center justify-center">
         {scene.explain && (
-          <Text className="text-lg text-center text-gray-700 mb-8 px-4">
+          <Text className="text-lg text-center mb-8 px-4" style={{ color: theme.colors.fontSecondary }}>
             {scene.explain}
           </Text>
         )}
 
-        <Text className="text-black font-noto font-extrabold text-[52px] my-8">
+        <Text className="font-noto font-extrabold text-[52px] my-8" style={{ color: theme.colors.font }}>
           {scene.text}
         </Text>
 
         {hasError ? (
-          <Text className="text-red-500 text-center mb-4">
+          <Text className="text-center mb-4" style={{ color: "#ef4444" }}>
             {t("audioLoadError")}
           </Text>
         ) : (
           <TouchableOpacity
-            className="bg-accent w-16 h-16 rounded-full justify-center items-center self-center"
+            className="w-16 h-16 rounded-full justify-center items-center self-center"
+            style={{ backgroundColor: theme.colors.accent }}
             onPress={handleManualPlay}
             disabled={isLoading || !scene.audio}
           >
             {isLoading ? (
-              <ActivityIndicator size="small" color="#1A1A1A" />
+              <ActivityIndicator size="small" color={theme.colors.secondary} />
             ) : (
               <Ionicons
                 name={isPlaying ? "pause" : "play"}
                 size={28}
-                color="#1A1A1A"
+                color={theme.colors.secondary}
               />
             )}
           </TouchableOpacity>
         )}
       </ScrollView>
 
-      <View className="flex-row justify-center items-center py-6 border-t border-card-border bg-card">
-        <Text className="text-base mr-3 text-font">{t("autoPlay")}:</Text>
+      <View className="flex-row justify-center items-center py-6 border-t" style={{ borderColor: theme.colors.cardBorder }}>
+        <Text className="text-base mr-3" style={{ color: theme.colors.font }}>{t("autoPlay")}:</Text>
         <Switch
-          trackColor={{ false: "#E5E7EB", true: "#C7FF00" }}
-          thumbColor={isEnabled ? "#FFFFFF" : "#f3f4f6"}
-          ios_backgroundColor="#E5E7EB"
+          trackColor={{ false: theme.colors.cardBorder, true: theme.colors.accent }}
+          thumbColor={isEnabled ? theme.colors.secondary : theme.colors.fontLight}
+          ios_backgroundColor={theme.colors.cardBorder}
           value={isEnabled}
           onValueChange={handleAutoPlayChange}
         />

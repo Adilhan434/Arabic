@@ -18,7 +18,13 @@ export const icons = {
   target: require("./assets/icons/target.png"),
   volume: require("./assets/icons/volume.png"),
   all_lessons: require("./assets/icons/allLessons.png"),
+  arrowRight: require("./assets/icons/arrow_right.png"),
+  ResetImg: require("./assets/icons/Reset.png"),
+  FeedbackImg: require("./assets/icons/send.png"),
+  RecommendImg: require("./assets/icons/share.png"),
 };
+
+
 
 export const texts = { 
   mainArabic: 'تعلم قراءة الح ',

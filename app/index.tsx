@@ -176,7 +176,7 @@ export default function Index() {
                   }}
                   activeOpacity={0.8}
                 >
-                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: theme.colors.font }}>
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: 'black' }}>
                     {t("goToTests")}
                   </Text>
                 </TouchableOpacity>
@@ -231,7 +231,7 @@ export default function Index() {
               }}
               activeOpacity={0.8}
             >
-              <Text style={{ fontSize: 18, fontWeight: 'bold', color: theme.colors.font }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>
                 {t("continue")}
               </Text>
             </TouchableOpacity>
@@ -248,7 +248,7 @@ export default function Index() {
             style={{ ...styles.cardShadow, flex: 1, marginRight: 8, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, alignItems: 'center' }}
             activeOpacity={0.7}
           >
-            <Image source={icons.book} style={{ width: 40, height: 40, marginBottom: 8 }} />
+            <Image source={icons.book} style={{ width: 40, height: 40, marginBottom: 8, tintColor: theme.colors.font }}   />
             <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
               {t("alphabet")}
             </Text>
@@ -277,7 +277,7 @@ export default function Index() {
             style={{ ...styles.cardShadow, flex: 1, marginHorizontal: 4, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, alignItems: 'center' }}
             activeOpacity={0.7}
           >
-            <Image style={{ width: 40, height: 40, marginBottom: 8 }} source={icons.all_lessons} />
+            <Image style={{ width: 40, height: 40, marginBottom: 8, tintColor: theme.colors.font }} source={icons.all_lessons} />
             <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
               {t("allLessons")}
             </Text>
@@ -291,7 +291,7 @@ export default function Index() {
             style={{ ...styles.cardShadow, flex: 1, marginLeft: 8, backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, alignItems: 'center' }}
             activeOpacity={0.7}
           >
-            <Image style={{ width: 40, height: 40, marginBottom: 8 }} source={icons.approval} />
+            <Image style={{ width: 40, height: 40, marginBottom: 8, tintColor: theme.colors.font }} source={icons.approval} />
             <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.font, textAlign: 'center' }}>
               {t("tests")}
             </Text>
@@ -302,121 +302,7 @@ export default function Index() {
     </SafeAreaView>
   );
 }
-//             </Text>
-//             <Text className="main-font text-center text-secondary text-[11px] px-1">
-//               {hadith.english}
-//             </Text>
-//             <View className="items-center mb-[20px] w-full">
-//               <View className="w-[65%] h-[1px] bg-white/40 my-[6px]" />
-//               <Text className="main-font text-center text-[#FFE4B5] text-[12px] font-semibold italic tracking-wide">
-//                 Prophet ﷺ {hadith.source ? `• ${hadith.source}` : ""}
-//               </Text>
-//             </View>
-//           </View>
-//         </View>
-//       </View>
 
-//       {/* statistics and actions (restored redesigned version) */}
-//       <View className="bg-secondary w-[345px] mt-[22px] rounded-[25px] px-[22px] pt-[18px] pb-[22px] min-h-[265px] flex justify-between">
-//         {/* progress + continue */}
-//         <View className="flex-row justify-between items-start">
-//           <View className="flex flex-col" style={{ maxWidth: 170 }}>
-//             <View className="flex-row flex-wrap items-end">
-//               <Text className="main-font text-[18px] font-semibold leading-[22px]">
-//                 {t("lesson")} {currentLesson.index}:
-//               </Text>
-//               <Text className="main-font text-[18px] font-semibold leading-[22px] ml-1">
-//                 {currentLesson.letter}
-//               </Text>
-//             </View>
-//             <View className="flex-row items-center mt-[6px]">
-//               <ProgressBar percent={progressPercent} />
-//               <Text className="main-font text-[11px] font-medium text-gray-600 ml-2">
-//                 {progressPercent}%
-//               </Text>
-//             </View>
-//             <View className="mt-[10px]">
-//               <Text className="main-font text-[10px] mt-[8px] text-gray-400 tracking-wide">
-//                 {progressTagline(progressPercent)}
-//               </Text>
-//             </View>
-//           </View>
-//           <Pressable
-//             className="bg-orange rounded-[32px] px-[20px] h-[44px] items-center justify-center"
-//             onPress={async () => {
-//               await playInterfaceSound();
-//               router.push(`/lesson/${currentLesson.lessonKey}/${currentScene}`);
-//             }}
-//           >
-//             <Text className="text-white font-semibold text-[16px] main-font">
-//               {t("continue")}
-//             </Text>
-//           </Pressable>
-//         </View>
-
-//         {/* actions */}
-//         <View className="mt-[20px] mb-[4px]">
-//           <View className="flex-row justify-between">
-//             <Pressable
-//               onPress={async () => {
-//                 await playInterfaceSound();
-//                 router.push("/alphabet");
-//               }}
-//               className="w-[95px] h-[88px] bg-orange/95 rounded-[18px] justify-center items-center"
-//             >
-//               <Image source={icons.book} />
-//               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-//                 {t("alphabet")}
-//               </Text>
-//             </Pressable>
-
-//             <TouchableOpacity
-//               onPress={async () => {
-//                 await playInterfaceSound();
-//                 try {
-//                   const lessonData = {
-//                     lessonKey: "alifBa",
-//                     letter: "ا ب",
-//                     index: 1,
-//                   };
-//                   await AsyncStorage.setItem(
-//                     "currentLesson",
-//                     JSON.stringify(lessonData)
-//                   );
-//                   setCurrentLesson(lessonData);
-//                   router.push("/allLessons");
-//                 } catch (error) {
-//                   console.error("Error saving lesson:", error);
-//                   router.push("/allLessons");
-//                 }
-//               }}
-//               className="w-[95px] h-[88px] bg-orange/95 rounded-[18px] justify-center items-center"
-//             >
-//               <Image className="w-[41px] h-[41px]" source={icons.all_lessons} />
-//               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-//                 {t("allLessons")}
-//               </Text>
-//             </TouchableOpacity>
-
-//             <Pressable
-//               onPress={async () => {
-//                 await playInterfaceSound();
-//                 router.push(`/test/${currentLesson.lessonKey}/1` as any);
-//               }}
-//               className="w-[95px] h-[88px] bg-orange/95 rounded-[18px] justify-center items-center"
-//             >
-//               <Image className="w-[41px] h-[41px]" source={icons.approval} />
-//               <Text className="main-font text-[12px] font-semibold text-secondary mt-[4px]">
-//                 {t("tests")}
-//               </Text>
-//             </Pressable>
-//           </View>
-//         </View>
-//       </View>
-//       <Footer></Footer>
-//     </View>
-//   );
-// }
 
 const styles = StyleSheet.create({
   cardShadow: {

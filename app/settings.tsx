@@ -1,15 +1,7 @@
-import arrowRight from "@/assets/icons/arrow_right.png";
-import ResetImg from "@/assets/icons/Reset.png";
-import FeedbackImg from "@/assets/icons/send.png";
-import RecommendImg from "@/assets/icons/share.png";
+import {icons} from "@/consonants.js";
 import DropdownLanguageSwitch from "@/components/DropdownLanguageSwitch";
 import { useLanguage } from "@/components/LanguageContext";
 import { useTheme } from "@/components/ThemeContext";
-import {
-  getNotificationStatus,
-  sendTestNotification,
-  setNotificationStatus,
-} from "@/utils/notificationUtils";
 import { playInterfaceSound } from "@/utils/soundUtils";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,16 +11,26 @@ import React, { useCallback, useState } from "react";
 import {
   Alert,
   Image,
-  Linking,
-  ScrollView,
+  Linking, Platform, ScrollView,
   Share,
   StatusBar,
   Switch,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+declare global {
+  var activeAudio: any;
+  var activeVideoPlayer: any;
+}
+
+// Импортируем функции уведомлений только для нативных платформ
+let notificationUtils: any = {};
+if (Platform.OS !== 'web') {
+  notificationUtils = require("@/utils/notificationUtils");
+}
 
 export default function Index() {
   const router = useRouter();
@@ -58,8 +60,11 @@ export default function Index() {
             setIsSoundEnabled(JSON.parse(soundSetting));
           }
 
-          const notificationStatus = await getNotificationStatus();
-          setIsNotificationsEnabled(notificationStatus);
+          if (Platform.OS !== 'web') {
+            const { getNotificationStatus } = notificationUtils;
+            const notificationStatus = await getNotificationStatus();
+            setIsNotificationsEnabled(notificationStatus);
+          }
         } catch (error) {
           console.error("Error loading settings:", error);
         }
@@ -84,9 +89,18 @@ export default function Index() {
   };
 
   const toggleNotifications = async () => {
+    if (Platform.OS === 'web') {
+      Alert.alert(
+        t("notifications") || "Notifications",
+        "Notifications are not supported on web platform"
+      );
+      return;
+    }
+
     const newValue = !isNotificationsEnabled;
     setIsNotificationsEnabled(newValue);
     try {
+      const { setNotificationStatus } = notificationUtils;
       await setNotificationStatus(newValue);
       await playInterfaceSound();
 
@@ -110,7 +124,17 @@ export default function Index() {
 
   const handleTestNotification = async () => {
     await playInterfaceSound();
+
+    if (Platform.OS === 'web') {
+      Alert.alert(
+        t("notifications") || "Notifications",
+        "Notifications are not supported on web platform"
+      );
+      return;
+    }
+
     try {
+      const { sendTestNotification } = notificationUtils;
       await sendTestNotification();
       Alert.alert(
         t("notifications") || "Notifications",
@@ -277,6 +301,23 @@ export default function Index() {
           <TouchableOpacity
             onPress={async () => {
               await playInterfaceSound();
+              
+              // Останавливаем активное аудио перед переходом на главную
+              try {
+                if (global.activeAudio) {
+                  await global.activeAudio.stopAsync();
+                  await global.activeAudio.unloadAsync();
+                  global.activeAudio = null;
+                }
+                
+                if (global.activeVideoPlayer) {
+                  await global.activeVideoPlayer.pause();
+                  global.activeVideoPlayer = null;
+                }
+              } catch (e) {
+                console.log("Error stopping media before going home:", e);
+              }
+              
               router.push("/");
             }}
             style={{ 
@@ -419,9 +460,7 @@ export default function Index() {
                 onPress={handleTestNotification}
                 activeOpacity={0.8}
               >
-                <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.font, textAlign: 'center' }}>
-                  🔔 Test Notification
-                </Text>
+               
               </TouchableOpacity>
             )}
           </View>
@@ -459,7 +498,7 @@ export default function Index() {
               justifyContent: 'center', 
               marginRight: 16 
             }}>
-              <Image source={ResetImg} style={{ width: 24, height: 24 }} />
+              <Image source={icons.ResetImg} style={{ width: 24, height: 24 }} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 16, fontWeight: '600', color: colors.font, marginBottom: 4 }}>
@@ -470,7 +509,7 @@ export default function Index() {
               </Text>
             </View>
             <Image
-              source={arrowRight}
+              source={icons.arrowRight}
               style={{ width: 20, height: 20, tintColor: colors.fontLight }}
             />
           </TouchableOpacity>
@@ -496,7 +535,7 @@ export default function Index() {
               justifyContent: 'center', 
               marginRight: 16 
             }}>
-              <Image source={FeedbackImg} style={{ width: 24, height: 24 }} />
+              <Image source={icons.FeedbackImg} style={{ width: 24, height: 24 }} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 16, fontWeight: '600', color: colors.font, marginBottom: 4 }}>
@@ -507,7 +546,7 @@ export default function Index() {
               </Text>
             </View>
             <Image
-              source={arrowRight}
+              source={icons.arrowRight}
               style={{ width: 20, height: 20, tintColor: colors.fontLight }}
             />
           </TouchableOpacity>
@@ -531,7 +570,7 @@ export default function Index() {
               justifyContent: 'center', 
               marginRight: 16 
             }}>
-              <Image source={RecommendImg} style={{ width: 24, height: 24 }} />
+              <Image source={icons.RecommendImg} style={{ width: 24, height: 24 }} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 16, fontWeight: '600', color: colors.font, marginBottom: 4 }}>
@@ -542,7 +581,7 @@ export default function Index() {
               </Text>
             </View>
             <Image
-              source={arrowRight}
+              source={icons.arrowRight}
               style={{ width: 20, height: 20, tintColor: colors.fontLight }}
             />
           </TouchableOpacity>
