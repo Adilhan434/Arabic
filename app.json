@@ -4,7 +4,7 @@
     "slug": "arabic",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/mainLogo.png",
+    "icon": "./assets/icons/mainLogo.png",
     "scheme": "arabic",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,7 +16,7 @@
         "NOTIFICATIONS"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/mainLogo.png",
+        "foregroundImage": "./assets/icons/mainLogo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -25,14 +25,14 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/icons/mainLogo.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/mainLogo.png",
+          "image": "./assets/icons/mainLogo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"

@@ -19,7 +19,10 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context"; 
+import RNEmail from 'react-native-email'
+
+
 
 declare global {
   var activeAudio: any;
@@ -122,41 +125,6 @@ export default function Index() {
     }
   };
 
-  const handleTestNotification = async () => {
-    await playInterfaceSound();
-
-    if (Platform.OS === 'web') {
-      Alert.alert(
-        t("notifications") || "Notifications",
-        "Notifications are not supported on web platform"
-      );
-      return;
-    }
-
-    try {
-      const { sendTestNotification } = notificationUtils;
-      await sendTestNotification();
-      Alert.alert(
-        t("notifications") || "Notifications",
-        "Test notification will appear in a moment! 🔔",
-        [
-          {
-            text: t("ok") || "OK",
-            onPress: async () => await playInterfaceSound(),
-          },
-        ]
-      );
-    } catch (error) {
-      console.error("Error sending test notification:", error);
-      Alert.alert(t("error") || "Error", "Failed to send test notification.", [
-        {
-          text: t("ok") || "OK",
-          onPress: async () => await playInterfaceSound(),
-        },
-      ]);
-    }
-  };
-
   const handleResetResults = async () => {
     await playInterfaceSound();
     Alert.alert(
@@ -213,48 +181,37 @@ export default function Index() {
       ]
     );
   };
+    const sendEmail = async () => {
+    const to = "adilhansatymkulov40@gmail.com";
+    const subject = t("feedbackEmailSubject") || "Feedback for Arabic Learning App";
+    const body = t("feedbackEmailBody") || "I would like to share the following feedback:";
+    const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-  const handleSendFeedback = async () => {
-    await playInterfaceSound();
     try {
-      const email = "support@yourapp.com";
-      const subject = encodeURIComponent(
-        t("feedbackEmailSubject") || "Feedback for Arabic Learning App"
-      );
-      const body = encodeURIComponent(
-        t("feedbackEmailBody") ||
-          "I would like to share the following feedback:"
-      );
-
-      const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
-
-      const canOpen = await Linking.canOpenURL(mailtoUrl);
-
-      if (canOpen) {
-        await Linking.openURL(mailtoUrl);
+      if (Platform.OS !== "web" && RNEmail && typeof RNEmail === "function") {
+        // RNEmail возвращает Promise
+        await RNEmail([to], { subject, body });
       } else {
-        Alert.alert(
-          t("emailNotAvailableTitle") || "Email Not Available",
-          t("emailNotAvailableMessage") ||
-            `Please send your feedback to: ${email}`,
-          [
-            {
-              text: t("ok") || "OK",
-              style: "cancel",
-              onPress: async () => await playInterfaceSound(),
-            },
-          ]
-        );
+        const canOpen = await Linking.canOpenURL(mailtoUrl);
+        if (!canOpen) {
+          Alert.alert(
+            t("emailNotAvailableTitle") || "Email Not Available",
+            t("emailNotAvailableMessage") || `Please send your feedback to: ${to}`
+          );
+          return;
+        }
+        await Linking.openURL(mailtoUrl);
       }
     } catch (error) {
       console.error("Error sending feedback:", error);
-      Alert.alert(
-        t("error") || "Error",
-        t("feedbackErrorMessage") ||
-          "An error occurred while trying to send feedback."
-      );
+      Alert.alert(t("error") || "Error", t("feedbackErrorMessage") || "An error occurred while trying to send feedback.");
     }
   };
+
+const handleSendFeedback = async () => {
+  await playInterfaceSound();
+  await sendEmail();
+};
 
   const handleRecommend = async () => {
     await playInterfaceSound();
@@ -513,21 +470,8 @@ export default function Index() {
                 />
               </View>
 
-            {/* Test Notification Button */}
-            {isNotificationsEnabled && (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: colors.accent,
-                  borderRadius: 12,
-                  paddingVertical: 12,
-                  marginTop: 16,
-                }}
-                onPress={handleTestNotification}
-                activeOpacity={0.8}
-              >
-               
-              </TouchableOpacity>
-            )}
+           
+           
           </View>
         </View>
 
